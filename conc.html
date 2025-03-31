@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UC Choudhary Technical Description</title>
+  <style>
+    /* --- Global Styles --- */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f7f7f7;
+    }
+    h1,h3 {
+      text-align: center;
+    }
+    nav {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #007acc;
+      font-weight: bold;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      display: block;
+      margin: 5px auto;
+      background-color: #fff;
+    }
+
+    /* --- Styles for Simulation M (from m.html) --- */
+    #simulation-m {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 50px;
+    }
+    #simulation-m #contents {
+      width: 80%;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    #simulation-m #contents h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+    #simulation-m #contents ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    #simulation-m #contents li {
+      margin-bottom: 8px;
+      font-size: 1.1em;
+    }
+    #simulation-m #contents a {
+      text-decoration: none;
+      color: #007acc;
+    }
+    #queue-m {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    #cores-m {
+      display: flex;
+      margin-top: 500px;
+    }
+    .thread {
+      width: 30px;
+      height: 30px;
+      margin: 0 5px;
+      border-radius: 50%;
+      background-color: #3498db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      position: absolute;
+    }
+    .core {
+      width: 60px;
+      height: 60px;
+      margin: 0 10px;
+      border-radius: 10px;
+      background-color: #2ecc71;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+      position: relative;
+    }
+    #lockStatus-m, #phaseIndicator-m {
+      margin: 5px 0;
+      font-size: 16px;
+    }
+    /* --- New Container for Side-by-Side Layout --- */
+    #logs-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 80%;
+      max-width: 700px;
+      margin: 20px auto;
+    }
+    /* Updated Task Completion Log */
+    #taskLog-m {
+      min-height: 100px;
+      overflow-y: auto;
+      width: 400px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 0;
+    }
+    /* Updated Legend: removed positional styling */
+    #legend {
+      border: 1px solid #ccc;
+      padding: 5px;
+      width: 250px;
+      background-color: #f9f9f9;
+    }
+    #legend h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+    #legend ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    #legend li {
+      margin-bottom: 5px;
+    }
+    .collapsible-section {
+      width: 80%;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .collapsible-header {
+      text-align: center;
+      cursor: pointer;
+      background-color: #e0e0e0;
+      padding: 10px;
+      margin: 0;
+      font-size: 1.5em;
+      user-select: none;
+    }
+    .collapsible-header .toggle-icon {
+      margin-left: 10px;
+    }
+    .collapsible-content {
+      padding: 15px;
+      display: block;
+    }
+    section {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    /* Apply a different light background color to each section */
+    section:nth-of-type(1) {
+      background-color: #f0f8ff; /* Light blue */
+    }
+    section:nth-of-type(2) {
+      background-color: #f5f5dc; /* Beige */
+    }
+    section:nth-of-type(3) {
+      background-color: #e6e6fa; /* Lavender */
+    }
+    section:nth-of-type(4) {
+      background-color: #fffacd; /* Lemon chiffon */
+    }
+    section:nth-of-type(5) {
+      background-color: #f0fff0; /* Honeydew */
+    }
+    section:nth-of-type(6) {
+      background-color: #f0f8ff; /* Light blue */
+    }
+    section:nth-of-type(7) {
+      background-color: #f5f5dc; /* Beige */
+    }
+    section:nth-of-type(8) {
+      background-color: #e6e6fa; /* Lavender */
+    }
+    section:nth-of-type(9) {
+      background-color: #fffacd; /* Lemon chiffon */
+    }
+    section:nth-of-type(10) {
+      background-color: #f0fff0; /* Honeydew */
+    }
+    section:nth-of-type(11) {
+      background-color: #f0fff0; /* Honeydew */
+    }
+    section:nth-of-type(12) {
+      background-color: #f0f8ff; /* Light blue */
+    }
+    section:nth-of-type(13) {
+      background-color: #f5f5dc; /* Beige */
+    }
+    section:nth-of-type(14) {
+      background-color: #e6e6fa; /* Lavender */
+    }
+    section:nth-of-type(15) {
+      background-color: #fffacd; /* Lemon chiffon */
+    }
+    section:nth-of-type(16) {
+      background-color: #f0fff0; /* Honeydew */
+    }
+    /* Citations section styling */
+    .citations-section {
+      width: 80%;
+      margin: 20px auto;
+      background-color: #eef;
+      border: 1px solid #99c;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .citations-header {
+      text-align: center;
+      cursor: pointer;
+      background-color: #cce;
+      padding: 10px;
+      margin: 0;
+      font-size: 1.4em;
+      user-select: none;
+    }
+    .citations-content {
+      padding: 15px;
+      display: block;
+    }
+    .citation-item {
+      margin-bottom: 10px;
+    }
+    a.sup-link {
+      text-decoration: none;
+      color: blue;
+      font-size: 0.8em;
+    }
+
+    /* --- Styles for Simulations B and C (from b.html and c.html) --- */
+    #simulation-b, #simulation-c {
+      text-align: center;
+      background-color: #f4f4f4;
+      margin-bottom: 50px;
+    }
+    #simulation-b canvas, #simulation-c canvas {
+      background-color: white;
+      display: block;
+      margin: 20px auto;
+      border: 1px solid black;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    .controls button {
+      font-size: 16px;
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    .controls input[type="range"],
+    .controls input[type="number"] {
+      width: 100px;
+    }
+    #simulation-c #explanation {
+      margin-top: 20px;
+      font-size: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+  </style>
+  <!-- GSAP Library (required for Simulation M) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"></script>
+</head>
+<body>
+  <h1>Concurrency and Conservative Two-Phase Locking: Keeping Computers in Sync</h1>
+  <h3 style="text-align: center;">Created by UC Choudhary © </h3>
+  <nav id="anc">
+    <div style="text-align: center; width: 100%;">
+      <p><strong>Animation Navbar</strong></p>
+    </div>
+    <a href="#simulation-b">Simulation A (Timeline Animation)</a> |
+    <a href="#simulation-c">Simulation B (Step Counter Simulation)</a> |
+    <a href="#queue-m">Simulation C (Conservative Two Phase Locking)</a> |
+    <a href="#canvas-m">Simulation C (Race Condition Concurrency)</a>
+  </nav>
+  <div style="text-align: center; width: 100%;">
+    For the best experience please view the animations in light mode.
+  </div>
+  <!-- ================= Simulation M ================= -->
+  <section id="simulation-m">
+    <!-- m.html Content (with updated IDs) -->
+    <section class="collapsible-section" id="sec0">
+      <div id="contents" style="text-align: center; width: 100%;">
+        <h2 class="collapsible-header">Contents</h2>
+        <div style="text-align: left;">
+          <ul>
+            <li><a href="#sec1">1. Introduction</a></li>
+            <li><a href="#sec2">2. Concurrency vs. Parallelism</a></li>
+            <li><a href="#sec3">3. Understanding Concurrency in Modern Computing</a></li>
+            <li><a href="#sec4">4. The Need for Concurrency Control</a></li>
+            <li><a href="#sec10">4.1. Animation1 Explanation</a></li>
+            <li><a href="#sec11">4.2. Animation2 Explanation</a></li>
+            <li><a href="#sec5">5. Delving into Two-Phase Locking (2PL)</a></li>
+            <li><a href="#sec6">6. Conservative Two-Phase Locking (C2PL): A Deadlock-Free Approach</a></li>
+            <li><a href="#sec7">7. Conclusion</a></li>
+            <li><a href="#citations">Citations</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Collapsible Section 1: Introduction -->
+    <section id="sec1" class="collapsible-section">
+      <h2 class="collapsible-header">
+        1. Introduction <sup><a href="#cite1" class="sup-link">[1]</a></sup><span class="toggle-icon">▲</span>
+      </h2>
+      <div class="collapsible-content">
+        <p>Imagine you’re in a bustling kitchen with multiple chefs, each juggling different tasks to create a perfect meal. Some chefs switch between tasks quickly, while others work side by side.
+           Computers face a similar challenge when handling multiple operations. Let us explore the concepts of concurrency, parallelism, atomicity, and synchronization—all that simplifies these ideas as graspable as a well-run kitchen.</p>
+        <p>
+          <p>For the purposes of this technical description there are no multithreaded optimizations to processes. Each thread carries a <strong>single</strong> process. For example: Adding melted butter to 'sauce à la hollandaise'. Just like there are many steps to completing a recipe, a program may be multithreaded as we learn to run more complex tasks in a single program, some tasks are so complex that computers don't have the bandwidth to keep up. This is why we care about concurrency.</p>
+         <strong>Two-phase locking(2PL): </strong><i>"Two-phase locking enforces a strict order on resource acquisition and release."</i> <sup><a href="#cite4" class="sup-link">[4]</a></sup><br />
+         <strong>Conservative Two-phase locking(C2PL): </strong><i>Conservative Two-phase locking enforces a strict order on resource acquisition and release. It ensures all required components are acquired before execution. C2PL mechanism "hold locks on all data items at the same time as in conservative two-phase locking"</i> <sup><a href="#cite0" class="sup-link">[0]</a></sup>
+        </p>
+        <!-- Wrap text and image in a div with flex layout -->
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <figure>
+              <img src="https://i.sstatic.net/apWtc.gif" width="740" height="240" alt="obtained image from flickr" />
+            <figcaption>Figure 1: A modern computer, where multiple tabs are handled efficiently. From  <a href="https://i.sstatic.net/apWtc.gif" target="_blank">Stack Overflow</a></a></figcaption>
+          </figure>
+          <p>If you know anything about Computer Hardware, you’ve likely heard about companies like Nvidia. Their specialized Graphics Processing Units (GPUs) are at the heart of modern computational power, particularly in powering artificial intelligence like ChatGPT and making AAA games. But how does this relate to our kitchen? Just as a chef uses various tools and ingredients to craft a dish, a computer uses hardware innovations and software techniques to perform multiple operations at once.<br /> </p>
+        </div>
+        <p><strong>Figure 1</strong> is showing how a user manually manages tabs but is oblivious to what is happening under the hood, which is what this article is about.
+          Since the audience is high school students I have abstracted away a lot of the prerequisites like caching, role of memory, scheduling algorithms, stacks, heaps, dynamic memory allocation,  and other key concepts in understanding concurrency at a high level. Through the help of animations and analogies, I have tried to simplify basic concurrency and its C2PL optimization.
+          </p>
+        <br />
+        <a href="#sec0"><strong>Back to Contents -></strong></a>
+      </div>
+    </section>
+    
+    <!-- Collapsible Section 2: Concurrency vs. Parallelism -->
+    <section id="sec2" class="collapsible-section">
+      <h2 class="collapsible-header">
+        2. Concurrency vs. Parallelism <sup><a href="#cite5" class="sup-link">[5]</a></sup><span class="toggle-icon">▲</span>
+      </h2>
+      <div class="collapsible-content">
+        <strong>Why learn about Operating Systems while learning about Computers?</strong><br />
+        <i>"Operating system concepts elucidate the principles of process scheduling and resource management."</i><sup><a href="#cite6" class="sup-link">[6]</a></sup>
+        <p>Before we get in too deep, it’s important to clarify a common misconception even among CS graduates: <strong>concurrency</strong> and <strong>parallelism</strong> are not the same thing.</p>
+        <h3 class="collapsible-header">2.1 Concurrency</h3>
+        <p>
+        </p>
+        <p>Concurrency is like a single chef rapidly switching between multiple dishes. The chef <i><mark>interleaves</mark></i> tasks so that all the dishes make progress, even if only one task is performed at a time. In computing, concurrency is the art of managing multiple tasks that can overlap in time.</p>
+        <p>In computing terms:</p>
+        <ul>
+          <li>Concurrency means managing multiple tasks that overlap in time</li>
+          <li>Only one task is actually being processed at any given moment</li>
+          <li>The computer switches between tasks so quickly it appears simultaneous</li>
+          <li>This is what happens when you have multiple apps open on a single-core computer</li>
+        </ul>
+        <h3 class="collapsible-header">2.2 Parallelism</h3>
+        <p>Parallelism happens when multiple chefs work simultaneously in the kitchen. In a computer, this is seen on multi-core processors or GPUs, where different cores handle different operations at the same time.</p>
+        <p>In computing terms:</p>
+        <ul>
+          <li>Parallelism means multiple tasks are literally executing at the same time</li>
+          <li>This requires multiple processors or cores (like having multiple chefs)</li>
+          <li>Each core handles its own task independently</li>
+          <li>Modern computers with multiple cores can truly perform parallel operations</li>
+        </ul>
+        <br />
+        <p>Understanding this difference is key to appreciating how computers juggle tasks efficiently.</p>
+        <br />
+        <a href="#sec0"><strong>Back to Contents -></strong></a>
+      </div>
+    </section>
+    
+    <!-- Collapsible Section 3: Understanding Concurrency in Modern Computing -->
+    <section id="sec3" class="collapsible-section">
+      <h2 class="collapsible-header">
+        3. Understanding Concurrency in Modern Computing <sup><a href="#cite2" class="sup-link">[2]</a></sup><span class="toggle-icon">▲</span>
+      </h2>
+      <div class="collapsible-content">
+        <h3>3.1 The Hardware Behind the Magic</h3>
+        <p>In the early days, computers were like kitchens with a single chef: one thread, one task at a time. Today's machines are much more powerful and complex:</p>
+<ul>
+<li><strong>CPU (Central Processing Unit):</strong> The main "brain" of your computer that handles most general tasks</li>
+<li><strong>Core:</strong> A processing unit within a CPU that can handle tasks independently. Modern CPUs have multiple cores (dual-core, quad-core, etc.)</li>
+<li><strong>GPU (Graphics Processing Unit):</strong> A specialized processor designed to handle graphics and certain types of calculations very efficiently</li>
+</ul>
+<p>Today's advanced hardware, such as Nvidia GPUs, feature thousands of tiny cores that work in parallel. Each core is capable of handling separate tasks, allowing for true parallelism and speeding up complex operations like training deep neural networks or rendering video game graphics.</p>
+        <p>In <strong>Figure 2</strong>, we see an <a href="https://www.amd.com/en/products/processors/workstations/ryzen-threadripper.html" target="_blank">AMD Threadripper</a> manage concurrent tasks . It has 96 cores each capable of 2.4 billion cycles per second. This means it can perform a tremendous number of operations simultaneously.</p>
+        <div style="text-align: center;">
+          <figure>
+        <img src="https://www.storagereview.com/wp-content/uploads/2023/10/image-27.png" width="640" height="380"/>
+        <figcaption>Figure2: Graphical Task Manager <a href="https://www.storagereview.com/news/amd-threadripper-7000-wx-series-cpus-launched">AMD Threadripper Stats</a></figcaption>
+        </figure>
+
+        </div>
+        <h3>3.2 Software’s Role: Atomicity and Synchronization</h3>
+        <p>While hardware gives us the muscle, software provides the finesse. Modern programming languages and operating systems support techniques like multithreading and asynchronous programming.</p>
+        <h2>What is Atomicity?</h2>
+        <p>Atomicity ensures that operations happen either completely or not at all. Think of it as a chef executing a precise, uninterruptible step in a recipe. For example, when making a sauce, either all ingredients are mixed in or none are—there's no in-between state.</p>
+        <p>In computing, an atomic operation cannot be interrupted halfway through. It's all or nothing, which helps prevent data from being corrupted when multiple processes try to access it.</p>
+        <h2>What is Synchronization?</h2>
+        <p>Synchronization is equally important. It's like placing a "do not use" sign on a critical kitchen tool. Synchronization mechanisms (like locks) ensure that when one process is using a shared resource, no other process can interfere.</p>
+        <p>Without proper synchronization, we risk race conditions—where multiple processes access or modify data concurrently, leading to unpredictable outcomes.</p>
+        <h2>Simulation A: Basic Concurrency</h2>
+        <p>This simulation helps us understand at a very basic level what concurrency does. Each thread performs tasks independently of the other thread. The slider controls the time each thread takes to complete one process cycle.</p>
+        <i>Instructions for using Simulation A:</i>
+        <ul>
+          <li>Move the slider to adjust the speed of thread execution</li>
+          <li>The simulation updates clock speed at the next cycle</li>
+          <li>To change the number of cores change them, then click the "Update Cores" button</li>
+        </ul>
+        <br />
+        <a href="#sec0"><strong>Back to Contents -></strong></a>
+      </div>
+    </section>
+    
+    <!-- ================= Simulation B ================= -->
+    <section id="simulation-b">
+      <h1>Very Basic Concurrency in Systems Programming</h1>
+      <p>This animation demonstrates how multiple threads execute across multiple CPU cores.</p>
+      <canvas id="canvas-b" width="800" height="400"></canvas>
+      <div class="controls">
+        <button id="prevStepBtn-b">⏮ Step Back</button>
+        <button id="playPauseBtn-b">Pause</button>
+        <button id="nextStepBtn-b">⏭ Step Forward</button>
+        <br><br>
+        <label for="speedControl-b">Speed:</label>
+        <input type="range" id="speedControl-b" min="100" max="2000" value="500" step="100">
+        <span id="speedValue-b">500ms</span>
+        <br><br>
+        <label for="threadCount-b">Threads:</label>
+        <input type="number" id="threadCount-b" min="1" max="10" value="4">
+        <button id="updateThreadsBtn-b">Update Threads</button>
+        <br><br>
+        <label for="cpuCores-b">CPU Cores:</label>
+        <input type="number" id="cpuCores-b" min="1" max="4" value="2">
+        <button id="updateCoresBtn-b">Update Cores</button>
+        <br><br>
+        <p>Elapsed Time: <span id="elapsedTime-b">0</span> seconds</p>
+        <br>
+        <button id="saveStateBtn-b">💾 Save Execution State</button>
+        <button id="loadStateBtn-b">📂 Load Execution State</button>
+      </div>
+      <script>
+        (function(){
+          const canvasB = document.getElementById("canvas-b");
+          const ctxB = canvasB.getContext("2d");
+          let numThreads = 4, numCores = 2, timelineLength = 10;
+          const threadColors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"];
+          let threadHeight = canvasB.height / numThreads, currentTime = 0, animationRunning = true, speed = 500, elapsedSeconds = 0;
+          let executionStates = [];
+          function generateExecutionStates() {
+            executionStates = [];
+            for (let i = 0; i < numThreads; i++) {
+              executionStates.push(Array.from({length: timelineLength}, () => Math.random() > 0.5 ? 1 : 0));
+            }
+          }
+          generateExecutionStates();
+          function draw() {
+            ctxB.clearRect(0, 0, canvasB.width, canvasB.height);
+            let coreHeight = canvasB.height / numCores;
+            for (let core = 0; core < numCores; core++) {
+              ctxB.fillStyle = "#ccc";
+              ctxB.fillRect(0, core * coreHeight, canvasB.width, 2);
+              ctxB.fillStyle = "black";
+              ctxB.font = "14px Arial";
+              ctxB.fillText(`Core ${core + 1}`, 10, (core + 1) * coreHeight - 10);
+            }
+            for (let thread = 0; thread < numThreads; thread++) {
+              let assignedCore = thread % numCores;
+              let baseY = assignedCore * coreHeight + (threadHeight / 2);
+              for (let time = 0; time < currentTime; time++) {
+                let state = executionStates[thread][time];
+                ctxB.fillStyle = state ? threadColors[thread % threadColors.length] : "#ddd";
+                ctxB.fillRect(time * (canvasB.width / timelineLength), baseY, canvasB.width / timelineLength, threadHeight - 5);
+              }
+              ctxB.fillStyle = "black";
+              ctxB.fillText(`Thread ${thread + 1}`, 10, baseY + threadHeight / 2 - 10);
+            }
+            currentTime++;
+            if (currentTime > timelineLength) { currentTime = 0; elapsedSeconds = 0; }
+            document.getElementById("elapsedTime-b").textContent = elapsedSeconds;
+            if (animationRunning) { setTimeout(draw, speed); }
+          }
+          draw();
+          document.getElementById("playPauseBtn-b").addEventListener("click", function() {
+            animationRunning = !animationRunning;
+            this.textContent = animationRunning ? "Pause" : "Play";
+            if (animationRunning) { draw(); }
+          });
+          document.getElementById("speedControl-b").addEventListener("input", function() {
+            speed = this.value;
+            document.getElementById("speedValue-b").textContent = `${speed}ms`;
+          });
+          document.getElementById("nextStepBtn-b").addEventListener("click", function() {
+            if (currentTime < timelineLength) { currentTime++; draw(); }
+          });
+          document.getElementById("prevStepBtn-b").addEventListener("click", function() {
+            if (currentTime > 0) { currentTime--; draw(); }
+          });
+          document.getElementById("updateThreadsBtn-b").addEventListener("click", function() {
+            numThreads = parseInt(document.getElementById("threadCount-b").value);
+            threadHeight = canvasB.height / numThreads;
+            generateExecutionStates();
+            currentTime = 0; elapsedSeconds = 0;
+            draw();
+          });
+          document.getElementById("updateCoresBtn-b").addEventListener("click", function() {
+            numCores = parseInt(document.getElementById("cpuCores-b").value);
+            draw();
+          });
+          document.getElementById("saveStateBtn-b").addEventListener("click", function() {
+            localStorage.setItem("executionStatesB", JSON.stringify(executionStates));
+            localStorage.setItem("numThreadsB", numThreads);
+            localStorage.setItem("numCoresB", numCores);
+            alert("Execution state saved!");
+          });
+          document.getElementById("loadStateBtn-b").addEventListener("click", function() {
+            let savedStates = localStorage.getItem("executionStatesB");
+            if (savedStates) {
+              executionStates = JSON.parse(savedStates);
+              numThreads = parseInt(localStorage.getItem("numThreadsB"));
+              numCores = parseInt(localStorage.getItem("numCoresB"));
+              threadHeight = canvasB.height / numThreads;
+              draw();
+              alert("Execution state loaded!");
+            } else { alert("No saved state found!"); }
+          });
+          setInterval(() => { if (animationRunning) { elapsedSeconds++; document.getElementById("elapsedTime-b").textContent = elapsedSeconds; } }, 1000);
+        })();
+      </script>
+      <br />
+      <strong>SIMULATION A</strong><br/>
+      <a href="#anc"><strong>Back to Animation Navbar -></strong></a>
+    </section>
+
+    <!-- Collapsible Section 4: The Need for Concurrency Control -->
+    <section id="sec4" class="collapsible-section">
+      <h2 class="collapsible-header">
+        4. The Need for Concurrency Control <sup><a href="#cite1" class="sup-link">[1]</a></sup><span class="toggle-icon">▲</span>
+      </h2>
+      <div class="collapsible-content">
+        <p>
+          <i>"Concurrency control prevents interference among simultaneous operations in a shared environment."</i> <sup><a href="#cite5" class="sup-link">[5]</a></sup>
+        </p>
+        <p>Even with the best software and hardware, chaos can ensue if multiple processes try to access the same resource simultaneously. This is known as a race condition. Race conditions are not only common, but expected when there are multiple people developing software independently, but there is a way to solve this bug.</p>
+        <h3>4.1 A Kitchen Analogy for Race Conditions</h3>
+        <p>Imagine two chefs in a restaurant kitchen both needing to prepare a different version of the delicious Hollandaise sauce. Chef A begins carefully balancing butter, egg yolks, and lemon juice. Before finishing, Chef B jumps in to use the sauce for their dish—unaware of Chef A’s progress—and alters it by adding extra butter. The result? A sauce with inconsistent taste and texture, much like how unsynchronized processes can produce unpredictable results in computing.</p>
+        <p>
+          "Advanced concurrency control algorithms mitigate deadlocks and optimize performance."<sup><a href="#cite3" class="sup-link">[3]</a></sup>
+        </p>
+        <h3>4.2 The Role of Synchronization and Atomicity</h3>
+        <p>To avoid such mishaps, computers use synchronization mechanisms like locks and atomic operations.<br/>
+          <strong>Locks:</strong> Ensure that only one process can modify a shared resource at a time.<br/>
+          <strong>Atomic operations:</strong> Atomic operations further guarantee that critical steps are completed fully before another process can intervene, maintaining the consistency and integrity of the data.<br />
+           Simulation B illustrates some key problems in concurrency in a single timeline.</p>
+        <br />
+        <a href="#sec0"><strong>Back to Contents -></strong></a>
+      </div>
+    </section>
+    
+    <!-- ================= Simulation C ================= -->
+<section id="simulation-c">
+    <h1>Possible Concurrency Problems</h1>
+    <p>
+      This animation uses a single timeline to show normal thread execution (steps 1–10),
+      a race condition between Threads 1 & 2 (steps 11–20), and a deadlock between Threads 3 & 4 (steps 21–30).
+    </p>
+    <canvas id="canvas-c" width="600" height="300"></canvas>
+    <div class="controls">
+      <button id="playPauseBtn-c">Pause</button>
+      <label for="speedControl-c">Speed:</label>
+      <input type="range" id="speedControl-c" min="100" max="2000" value="500" step="100">
+      <span id="speedValue-c">500ms</span>
+    </div>
+    <div id="explanation">
+      <strong>Explanation:</strong><br>
+      <em>Normal Execution (Steps 1–10):</em> Each row is a thread; colored blocks show when the thread is active.<br>
+      <em>Race Condition (Steps 11–20):</em> Threads 1 & 2 concurrently update a shared variable.<br>
+      <em>Deadlock (Steps 21–30):</em> Threads 3 & 4 are waiting for each other's locks.
+    </div>
+    <script>
+      (function(){
+        const canvasC = document.getElementById("canvas-c");
+        const ctxC = canvasC.getContext("2d");
+        let animationRunning = true, speed = 500, currentTime = 1, timelineLength = 30;
+        const numThreads = 4, threadColors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"];
+        const threadHeight = canvasC.height / numThreads;
+        let executionStates = [];
+        
+        function generateExecutionStates() {
+          executionStates = [];
+          for (let i = 0; i < numThreads; i++) {
+            let states = Array.from({ length: timelineLength }, () => (Math.random() > 0.5 ? 1 : 0));
+            executionStates.push(states);
+          }
+          for (let t = 10; t < 20; t++) {
+            executionStates[0][t] = 1;
+            executionStates[1][t] = 1;
+          }
+          for (let t = 20; t < 30; t++) {
+            executionStates[2][t] = 1;
+            executionStates[3][t] = 1;
+          }
+        }
+        
+        generateExecutionStates();
+        
+        function draw() {
+          ctxC.clearRect(0, 0, canvasC.width, canvasC.height);
+          
+          // Draw thread execution blocks
+          for (let thread = 0; thread < numThreads; thread++) {
+            for (let t = 0; t < currentTime; t++) {
+              let state = executionStates[thread][t];
+              ctxC.fillStyle = state ? threadColors[thread] : "#ddd";
+              ctxC.fillRect(t * (canvasC.width / timelineLength), thread * threadHeight, canvasC.width / timelineLength, threadHeight - 5);
+            }
+            ctxC.fillStyle = "black";
+            ctxC.font = "14px Arial";
+            ctxC.fillText(`Thread ${thread + 1}`, 10, (thread + 1) * threadHeight - 10);
+          }
+          
+          // --- Overlay for Race Condition (Steps 11–20) ---
+          if (currentTime >= 11 && currentTime <= 20) {
+            // Draw a shared counter box at the top center
+            const counterX = canvasC.width / 2 - 40,
+                  counterY = 10,
+                  counterW = 80,
+                  counterH = 40;
+            ctxC.fillStyle = "#eee";
+            ctxC.fillRect(counterX, counterY, counterW, counterH);
+            ctxC.strokeStyle = "black";
+            ctxC.strokeRect(counterX, counterY, counterW, counterH);
+            ctxC.fillStyle = "black";
+            ctxC.font = "14px Arial";
+            ctxC.fillText("Shared", counterX + 10, counterY + 15);
+            ctxC.fillText("Counter", counterX + 5, counterY + 30);
+  
+            // Calculate the x-position of the current timeline block
+            const blockWidth = canvasC.width / timelineLength;
+            const currentBlockX = (currentTime - 0.5) * blockWidth;
+            // Determine vertical centers for Threads 1 and 2
+            const thread1Y = threadHeight / 2;
+            const thread2Y = threadHeight + threadHeight / 2;
+            const counterCenterX = counterX + counterW / 2,
+                  counterCenterY = counterY + counterH / 2;
+  
+            ctxC.strokeStyle = "green";
+            ctxC.lineWidth = 2;
+            // Arrow from Thread 1 block to the shared counter
+            ctxC.beginPath();
+            ctxC.moveTo(currentBlockX, thread1Y);
+            ctxC.lineTo(counterCenterX, counterCenterY);
+            ctxC.stroke();
+            // Arrow from Thread 2 block to the shared counter
+            ctxC.beginPath();
+            ctxC.moveTo(currentBlockX, thread2Y);
+            ctxC.lineTo(counterCenterX, counterCenterY);
+            ctxC.stroke();
+            
+            // Explanatory text for race condition
+            ctxC.fillStyle = "green";
+            ctxC.font = "16px Arial";
+            ctxC.fillText(
+              "Race Condition: Threads 1 & 2 concurrently update a shared variable",
+              canvasC.width / 2 - 200,
+              canvasC.height - 30
+            );
+          }
+          
+          // --- Overlay for Deadlock (Steps 21–30) ---
+          if (currentTime >= 21 && currentTime <= 30) {
+            // For Threads 3 and 4 (indices 2 and 3), draw arrows to indicate waiting
+            const blockWidth = canvasC.width / timelineLength;
+            const currentBlockX = (currentTime - 0.5) * blockWidth;
+            const thread3Y = 2 * threadHeight + threadHeight / 2;
+            const thread4Y = 3 * threadHeight + threadHeight / 2;
+            
+            ctxC.strokeStyle = "red";
+            ctxC.lineWidth = 2;
+            // Arrow from Thread 3's block to Thread 4's block
+            ctxC.beginPath();
+            ctxC.moveTo(currentBlockX, thread3Y);
+            ctxC.lineTo(currentBlockX, thread4Y);
+            ctxC.stroke();
+            // Arrow from Thread 4's block to Thread 3's block
+            ctxC.beginPath();
+            ctxC.moveTo(currentBlockX, thread4Y);
+            ctxC.lineTo(currentBlockX, thread3Y);
+            ctxC.stroke();
+            
+            // Explanatory text for the deadlock
+            ctxC.fillStyle = "black";
+            ctxC.font = "16px Arial";
+            ctxC.fillText(
+              "Deadlock: Threads 3 & 4 are waiting for each other's locks",
+              canvasC.width / 2 - 200,
+              canvasC.height - 50
+            );
+          }
+          
+          // --- Draw the Step Counter ---
+          ctxC.fillStyle = "black";
+          ctxC.font = "16px Arial";
+          ctxC.fillText("Step: " + currentTime, canvasC.width - 100, 20);
+          
+          currentTime++;
+          if (currentTime > timelineLength) { 
+            currentTime = 1; 
+            generateExecutionStates(); 
+          }
+          
+          if (animationRunning) { 
+            setTimeout(draw, speed); 
+          }
+        }
+        
+        draw();
+        
+        document.getElementById("playPauseBtn-c").addEventListener("click", function () {
+          animationRunning = !animationRunning;
+          this.textContent = animationRunning ? "Pause" : "Play";
+          if (animationRunning) { draw(); }
+        });
+        
+        document.getElementById("speedControl-c").addEventListener("input", function () {
+          speed = this.value;
+          document.getElementById("speedValue-c").textContent = `${speed}ms`;
+        });
+      })();
+    </script>
+    <br />
+    <strong>SIMULATION B</strong><br />
+    <a href="#anc"><strong>Back to Animation Navbar -></strong></a>
+  </section>
+
+    <!-- Collapsible Section 10: Simulation C: Animation 1 Explanation -->
+    <section id="sec10" class="collapsible-section">
+      <h2 class="collapsible-header">
+        Simulation C: Animation 1 Explanation<span class="toggle-icon">▲</span>
+      </h2>
+      <div class="collapsible-content">
+        <p><strong>Animation1 Explanation:</strong><br>
+          The first animation is a dynamic simulation powered by <em><a href="https://gsap.com/" target="_blank">GSAP</a> (a JS library that is the industry standard for animation)</em> that visually demonstrates how a concurrent system manages tasks using a <em>two-phase locking (2PL)</em> mechanism. In this animation, tasks are represented by <em>"threads"</em> that are created and queued, then move dynamically toward available processing cores. By the time you read this the animation might have ended, please click the run again button to run the animation again. I decided to make this a button because this animation is resource intensive. As each thread reaches its designated core area, it attempts to acquire a lock before entering a critical section—a process that simulates ensuring exclusive access to a shared resource. Once a thread successfully enters the critical section, it updates a shared counter (simulating resource use) and then eventually exits, releasing the lock for subsequent tasks. This vivid depiction helps users understand key concepts like resource contention, atomic operations, and the orderly progression of tasks in a concurrent environment. 
+        </p>
+        <br />
+        <a href="#sec0"><strong>Back to Contents -></strong></a>    
+      </div>
+    </section>
+
+    <!-- Simulation M: Animation Elements -->
+    <div id="queue-m"></div>
+    <div id="cores-m"></div>
+    <div id="lockStatus-m">Lock Status: Unlocked</div>
+    <div id="phaseIndicator-m">Phase: Idle</div>
+    <!-- New container wrapping Task Log and Legend -->
+    <button id="runAgainBtn" style="display:none;">Run Again</button>
+    <div id="logs-container">
+
+      <div id="taskLog-m">Task Completion Log:</div>
+      <div id="legend">
+        <h2>Legend</h2>
+        <ul>
+          <li><strong>Lock Status: Locked</strong> - At least one task is running.</li>
+          <li><strong>Lock Status: Unlocked</strong> - No tasks are running.</li>
+          <li><strong>Phase: Idle</strong> - No tasks in the system.</li>
+          <li><strong>Phase: Growing</strong> - Some tasks are running and tasks are queued.</li>
+          <li><strong>Phase: At Capacity</strong> - All cores are busy.</li>
+          <li><strong>Phase: Overloaded</strong> - More tasks than cores.</li>
+          <li><strong>Phase: Shrinking</strong> - Tasks are completing and the system winds down.</li>
+        </ul>
+      </div>
+    </div>
+    <br />
+    <a href="#anc"><strong>Back to Animation Navbar -></strong></a>
+    <p>
+      <strong>Simulation C: Animation1</strong>: Demonstrates 2PL with 4 cores and 20 threads.<br>
+    </p>
+    <section id="sec11" class="collapsible-section">
+      <h2 class="collapsible-header">
+        Simulation C: Animation2 Explanation <span class="toggle-icon">▲</span>
+      </h2>
+      <div class="collapsible-content">
+        <p>
+          The second animation serves as a static visual framework that complements the dynamic simulation. It renders multiple parallel tracks and a clearly defined critical section on a canvas, symbolizing the spatial pathways, along which tasks progress. These tracks represent the ordered routes that threads follow, emphasizing the underlying structure of process scheduling and resource allocation in a multi-threaded system. The critical section is highlighted to symbolize the area where resource conflicts might occur if proper synchronization is not maintained. This visualization reinforces the theoretical concepts by providing a concrete, spatial illustration of how tasks are managed and how potential contention is organized within the system. inCS is when a task is in the critical section.
+        </p>
+        <br />
+        <a href="#sec0"><strong>Back to Contents -></strong></a> 
+      </div>
+    </section>
+
+    <!-- Simulation M: Canvas -->
+    <canvas id="canvas-m" width="900" height="700"></canvas>
+
+    <!-- Simulation M: GSAP Animation Script -->
+    <script>
+      (function(){
+        // Configuration constants
+        const numThreads = 20;
+        const numCores = 4;
+        const TASK_MOVE_DURATION = 2;
+        const REMOVE_DURATION = 2;
+        const TASK_ENQUEUE_INTERVAL = 2500;
+        function getRandomCompleteDelay() { return Math.floor(Math.random() * 4 + 2); }
+        const COMPLETE_DURATION = 1;
+        // DOM Elements (renamed for Simulation M)
+        const queueM = document.getElementById('queue-m');
+        const coresM = document.getElementById('cores-m');
+        const lockStatusM = document.getElementById('lockStatus-m');
+        const phaseIndicatorM = document.getElementById('phaseIndicator-m');
+        const taskLogM = document.getElementById('taskLog-m');
+        const canvasM = document.getElementById('canvas-m');
+        const ctxM = canvasM.getContext('2d');
+        let lockAcquired = false, sharedCounter = 0;
+        const csArea = { x: 300, y: 200, width: 300, height: 450 };
+        const tracks = [
+          { startX: 0, startY: 250, endX: 900, endY: 250 },
+          { startX: 0, startY: 350, endX: 900, endY: 350 },
+          { startX: 0, startY: 450, endX: 900, endY: 450 },
+          { startX: 0, startY: 550, endX: 900, endY: 550 }
+        ];
+        const threads = [
+          { id: 1, x: 0, y: 250, color: "#f39c12", state: "approaching", delay: 1000, timer: 0 },
+          { id: 2, x: 0, y: 350, color: "#27ae60", state: "approaching", delay: 2000, timer: 0 },
+          { id: 3, x: 0, y: 450, color: "#2980b9", state: "approaching", delay: 3000, timer: 0 },
+          { id: 4, x: 0, y: 550, color: "#8e44ad", state: "approaching", delay: 4000, timer: 0 }
+        ];
+        const threadSpeed = 2.1, csTime = 1428.57;
+        let lastTimestamp = 0, activeThreads = 0, taskCounter = 1;
+        let coreAvailability = Array(numCores).fill(true);
+        let waitingQueue = [];
+        let lastLockUpdateTime = 0, currentLockStatus = "";
+        let lastPhaseUpdateTime = 0, currentPhase = "";
+        // Helper functions
+        function formatTimestamp(date = new Date()) {
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          const seconds = String(date.getSeconds()).padStart(2, '0');
+          const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+          return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+        }
+        function drawTracks() {
+          ctxM.strokeStyle = "#cccccc";
+          ctxM.lineWidth = 2;
+          tracks.forEach(track => { ctxM.beginPath(); ctxM.moveTo(track.startX, track.startY); ctxM.lineTo(track.endX, track.endY); ctxM.stroke(); });
+        }
+        function drawStatic() {
+          ctxM.clearRect(0, 0, canvasM.width, canvasM.height);
+          ctxM.font = "24px Arial";
+          ctxM.fillStyle = "#333";
+          ctxM.fillText("Concurrency Animation: Threads & Critical Section", 150, 40);
+          drawTracks();
+          ctxM.strokeStyle = lockAcquired ? "#d9534f" : "#007acc";
+          ctxM.lineWidth = 3;
+          ctxM.strokeRect(csArea.x, csArea.y, csArea.width, csArea.height);
+          ctxM.font = "18px Arial";
+          ctxM.fillStyle = "#333";
+          ctxM.fillText("Critical Section", csArea.x + 80, csArea.y + 200);
+          ctxM.fillText("Shared Resource Access", csArea.x + 40, csArea.y + 220);
+          ctxM.font = "20px Arial";
+          ctxM.fillText("Shared Counter: " + sharedCounter, 600, 80);
+        }
+        function drawThread(thread) {
+          const carWidth = 40, carHeight = 20;
+          ctxM.fillStyle = thread.color;
+          ctxM.fillRect(thread.x - carWidth/2, thread.y - carHeight/2, carWidth, carHeight);
+          ctxM.strokeStyle = "#333";
+          ctxM.strokeRect(thread.x - carWidth/2, thread.y - carHeight/2, carWidth, carHeight);
+          ctxM.font = "12px Arial";
+          ctxM.fillStyle = "#333";
+          ctxM.fillText("Thread " + thread.id, thread.x - carWidth/2, thread.y - carHeight/2 - 5);
+          ctxM.fillText(thread.state, thread.x - carWidth/2, thread.y + carHeight/2 + 15);
+        }
+        function resetThreads() {
+          threads.forEach(thread => { thread.x = 0; thread.state = "approaching"; thread.timer = 0; });
+          lockAcquired = false;
+        }
+        function safeUpdateLockStatus(newStatus, newColor) {
+          const now = performance.now();
+          if (currentLockStatus !== newStatus) {
+            const elapsed = now - lastLockUpdateTime;
+            const delay = elapsed < 2000 ? 2000 - elapsed : 0;
+            setTimeout(() => {
+              lockStatusM.textContent = `Lock Status: ${newStatus}`;
+              lockStatusM.style.color = newColor;
+              currentLockStatus = newStatus;
+              lastLockUpdateTime = performance.now();
+            }, delay);
+          }
+        }
+        function safeUpdatePhaseIndicator(newPhase) {
+          const now = performance.now();
+          if (currentPhase !== newPhase) {
+            const elapsed = now - lastPhaseUpdateTime;
+            const delay = elapsed < 2000 ? 2000 - elapsed : 0;
+            setTimeout(() => {
+              phaseIndicatorM.textContent = `Phase: ${newPhase}`;
+              currentPhase = newPhase;
+              lastPhaseUpdateTime = performance.now();
+            }, delay);
+          }
+        }
+        // Create cores
+        const coreElementsM = [];
+        for (let i = 1; i <= numCores; i++) {
+          const core = document.createElement('div');
+          core.classList.add('core');
+          core.textContent = `Core ${i}`;
+          coresM.appendChild(core);
+          coreElementsM.push(core);
+        }
+        function createThreadElement() {
+          const threadEl = document.createElement('div');
+          threadEl.classList.add('thread');
+          threadEl.textContent = taskCounter++;
+          queueM.appendChild(threadEl);
+          return threadEl;
+        }
+        function assignTaskToCore(threadEl, coreIndex) {
+          const core = coreElementsM[coreIndex];
+          coreAvailability[coreIndex] = false;
+          const coreRect = core.getBoundingClientRect();
+          const queueRect = queueM.getBoundingClientRect();
+          gsap.to(threadEl, {
+            duration: TASK_MOVE_DURATION,
+            x: coreRect.left - queueRect.left,
+            y: coreRect.top - queueRect.top,
+            onStart: () => {
+              activeThreads++;
+              safeUpdateLockStatus("Locked", "red");
+              updatePhaseIndicator();
+              logTaskEvent(threadEl.textContent, `entered Core ${coreIndex + 1}`);
+            },
+            onComplete: () => {
+              const completeDelay = getRandomCompleteDelay();
+              gsap.to(threadEl, {
+                duration: COMPLETE_DURATION,
+                backgroundColor: '#e74c3c',
+                delay: completeDelay,
+                onComplete: () => {
+                  logTaskEvent(threadEl.textContent, `completed at Core ${coreIndex + 1}`);
+                  gsap.to(threadEl, {
+                    duration: REMOVE_DURATION,
+                    x: 0,
+                    y: 0,
+                    opacity: 0,
+                    onComplete: () => {
+                      queueM.removeChild(threadEl);
+                      activeThreads--;
+                      coreAvailability[coreIndex] = true;
+                      safeUpdateLockStatus(activeThreads > 0 ? "Locked" : "Unlocked", activeThreads > 0 ? "red" : "green");
+                      updatePhaseIndicator();
+                      processNextTask();
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+        function processNextTask() {
+          for (let i = 0; i < numCores; i++) {
+            if (coreAvailability[i] && waitingQueue.length > 0) {
+              const nextThread = waitingQueue.shift();
+              assignTaskToCore(nextThread, i);
+            }
+          }
+          updatePhaseIndicator();
+        }
+//         const taskCreatorInterval = setInterval(() => {
+//   if (taskCounter <= numThreads) {
+//     const newThreadEl = createThreadElement();
+//     waitingQueue.push(newThreadEl);
+//     processNextTask();
+//   } else {
+//     taskLogM.innerHTML = "";
+//     taskCounter = 1;
+//   }
+// }, TASK_ENQUEUE_INTERVAL);
+// Function to start the task creator interval
+function startTaskCreatorInterval() {
+  return setInterval(() => {
+    if (taskCounter <= numThreads) {
+      const newThreadEl = createThreadElement();
+      waitingQueue.push(newThreadEl);
+      processNextTask();
+    } else {
+      clearInterval(taskCreatorInterval);
+      // Show the Run Again button when tasks complete
+      document.getElementById("runAgainBtn").style.display = "block";
+    }
+  }, TASK_ENQUEUE_INTERVAL);
+}
+
+let taskCreatorInterval = startTaskCreatorInterval();
+
+// Add an event listener for the Run Again button
+document.getElementById("runAgainBtn").addEventListener("click", () => {
+  // Clear the task log when restarting
+  taskLogM.innerHTML = "";
+  // Reset task counter and waiting queue
+  taskCounter = 1;
+  waitingQueue = [];
+  // Restart the task creation interval
+  taskCreatorInterval = startTaskCreatorInterval();
+  // Hide the Run Again button until the counter exceeds again
+  document.getElementById("runAgainBtn").style.display = "none";
+});
+
+
+        function updatePhaseIndicator() {
+          if (activeThreads === 0 && waitingQueue.length === 0) {
+            safeUpdatePhaseIndicator("Idle");
+          } else if (activeThreads < numCores && waitingQueue.length > 0) {
+            safeUpdatePhaseIndicator("Growing");
+          } else if (activeThreads === numCores) {
+            safeUpdatePhaseIndicator("At Capacity");
+          } else if (activeThreads > numCores) {
+            safeUpdatePhaseIndicator("Overloaded");
+          } else {
+            safeUpdatePhaseIndicator("Shrinking");
+          }
+        }
+        function logTaskEvent(task, event) {
+          const timestamp = formatTimestamp();
+          const logEntry = document.createElement('div');
+          logEntry.textContent = `Task ${task} ${event} at ${timestamp}`;
+          taskLogM.appendChild(logEntry);
+          taskLogM.scrollTop = taskLogM.scrollHeight;
+        }
+        function animate(timestamp) {
+          if (!lastTimestamp) lastTimestamp = timestamp;
+          const deltaTime = timestamp - lastTimestamp;
+          lastTimestamp = timestamp;
+          drawStatic();
+          updateThreads(deltaTime);
+          threads.forEach(drawThread);
+          if (threads.every(thread => thread.state === "done")) { resetThreads(); }
+          requestAnimationFrame(animate);
+        }
+        function updateThreads(deltaTime) {
+          threads.forEach(thread => {
+            if (performance.now() < thread.delay) return;
+            if (thread.state === "approaching") {
+              if (thread.x < csArea.x - 30) {
+                thread.x += threadSpeed;
+              } else {
+                if (!lockAcquired) { lockAcquired = true; thread.state = "inCS"; sharedCounter++; thread.timer = 0; }
+                else { thread.state = "waiting"; }
+              }
+            } else if (thread.state === "waiting") {
+              if (!lockAcquired) { thread.state = "approaching"; }
+            } else if (thread.state === "inCS") {
+              thread.timer += deltaTime;
+              if (thread.timer >= csTime) { thread.state = "exiting"; lockAcquired = false; }
+            } else if (thread.state === "exiting") {
+              if (thread.x < canvasM.width - 10) { thread.x += threadSpeed; }
+              else { thread.state = "done"; }
+            }
+          });
+        }
+        requestAnimationFrame(animate);
+      })();
+    </script>
+    <br />
+    <p><strong>SIMULATION C: ANIMATION2</strong></p>
+    <a href="#anc"><strong>Back to Animation Navbar -></strong></a>
+  </section>
+
+  <!-- Collapsible Section 5: Delving into Two-Phase Locking (2PL) -->
+  <section id="sec5" class="collapsible-section">
+    <h2 class="collapsible-header">
+      5. Delving into Two-Phase Locking (2PL) <sup><a href="#cite1" class="sup-link">[1]</a></sup><span class="toggle-icon">▲</span>
+    </h2>
+    <div class="collapsible-content">
+      <p>To manage the challenges of concurrent operations, especially in database systems, computer scientists developed protocols like Two-Phase Locking (2PL).</p>
+      <h3>5.1 The Growing Phase (Locking)</h3>
+      <p>Imagine a chef gathering all necessary ingredients and tools before starting to cook. In the growing phase, a transaction (or chef) locks every resource it needs. During this phase, the chef can acquire more locks but isn’t allowed to release any—ensuring that all required elements are secured before the operation begins.</p>
+      <h3>5.2 The Shrinking Phase (Unlocking)</h3>
+      <p>Once the cooking (or transaction) has started, the chef enters the shrinking phase by releasing the locks. No new locks are acquired during this period. This process is akin to cleaning up after a meal; as ingredients are put away, no new ones are brought out. This disciplined approach helps maintain consistency and prevents conflicts.</p>
+      <div style="text-align: center;">
+      <figure>
+        <a data-flickr-embed="true" href="https://www.flickr.com/photos/202310149@N07/54363327456/in/dateposted-public/" title="table" target="_blank"><img src="https://live.staticflickr.com/65535/54363327456_de42b024b0_z.jpg" width="700" height="502" alt="table" target="_blank"/></a><script async src="//embedr.flickr.com/assets/client-code.js" target="_blank" charset="utf-8"></script>
+        <figcaption>Figure 3: A table from Wikipedia that compares various concurrency protocols. From  <a href="https://en.wikipedia.org/w/index.php?title=Two-phase_locking&oldid=1263569407" target="_blank">Wikipedia</a></a></figcaption>
+      </figure>
+      </div>
+      <h3>5.3 Benefits and Challenges</h3>
+      <p>2PL guarantees serializability, meaning that even though operations are concurrent, the end result is as if they had been executed sequentially. However, there’s a catch: if two transactions hold locks that each other needs, they might end up waiting indefinitely—a situation known as a deadlock.</p>
+      <br />
+      <a href="#sec0"><strong>Back to Contents -></strong></a>
+    </div>
+  </section>
+  
+  <!-- Collapsible Section 6: Conservative Two-Phase Locking (C2PL): A Deadlock-Free Approach -->
+  <section id="sec6" class="collapsible-section">
+    <h2 class="collapsible-header">
+      6. Conservative Two-Phase Locking (C2PL): A Deadlock-Free Approach <sup><a href="#cite3" class="sup-link">[3]</a></sup><span class="toggle-icon">▲</span>
+    </h2>
+    <div class="collapsible-content">
+      <p>To further guard against deadlocks, an enhanced version of 2PL called Conservative Two-Phase Locking (C2PL) was developed.</p>
+      <h3>6.1 How It Works</h3>
+      <p>In C2PL, a transaction must request and acquire all the locks it will ever need before it starts executing. If even one required resource is locked by another process, the transaction will wait until every single resource is available. This “all-or-nothing” approach prevents the partial execution that can lead to deadlocks—where two or more transactions are stuck waiting for each other.</p>
+      <h3>6.2 Advantages</h3>
+      <p>The primary advantage of C2PL is its ability to completely eliminate deadlocks. Since every transaction begins only when it has full control of the necessary resources, there’s no chance for the circular wait condition that typically causes deadlocks.</p>
+      <h3>6.3 Trade-offs and Drawbacks</h3>
+      <p>While C2PL creates a more stable and predictable environment, it can sometimes reduce overall system efficiency. In a busy system, waiting to acquire all locks before starting can slow down processes. This trade-off between safety (deadlock prevention) and performance (throughput) is a critical consideration for system designers. In systems where it is acceptable to compromise on speed and not on data integrity, C2PL is the best protocol, for regular users, we generally use other protocols.</p>
+      <br />
+      <a href="#sec0"><strong>Back to Contents -></strong></a>
+    </div>
+  </section>
+  
+  <!-- Collapsible Section 7: Conclusion -->
+  <section id="sec7" class="collapsible-section">
+    <h2 class="collapsible-header">
+      7. Conclusion <sup><a href="#cite1" class="sup-link">[1]</a></sup><span class="toggle-icon">▲</span>
+    </h2>
+    <div class="collapsible-content">
+      <p>In today’s digital world, the ability to manage multiple tasks safely and efficiently is paramount. Concurrency and parallelism empower computers to handle many operations, while atomicity and synchronization ensure these tasks are performed without stepping on each other’s toes. Two-Phase Locking (2PL) provides a structured way to maintain order, and its stricter counterpart, Conservative Two-Phase Locking (C2PL), offers a robust solution to avoid deadlocks.</p>
+      <p>I have tried to explain concurrency through the use of multiple animations, but it is important to understand that the animations are astronomically (a few billion times) slower than what is actually happening. </p>
+      <p>From the powerful GPUs accelerating AI to sophisticated databases preserving data integrity, these techniques form the backbone of modern computing. By understanding the balance between resource locking, atomicity, and synchronization, you gain valuable insights into how complex systems operate reliably—even when they’re doing many things at once.</p>
+      <br />
+      <a href="#sec0"><strong>Back to Contents -></strong></a>
+    </div>
+  </section>
+  <section id="citations" class="citations-section">
+    <h2 id="citations-header" class="citations-header">
+      Core Citation
+    </h2>
+    <div class="citation-item" id="cite0">
+    [0] Al-Jumah, N.B., et al. "Implementation and Modeling of Two-Phase Locking Concurrency Control—A Performance Study." Information and Software Technology, vol. 42, no. 4, 2000, pp. 257-73. <a href="https://doi.org/10.1016/S0950-5849(99)00062-2" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/S0950-5849(99)00062-2</a><br />
+    <hr />
+    <div class="citation-item" id="cite0">
+    <h2 id="citations-header" class="citations-header">
+      Other Citations
+    </h2>
+    <div id="citations-content" class="citations-content">
+      <div class="citation-item" id="cite1">
+        [1] Bernstein, Philip A., Hadzilacos, Vassos , and Goodman, Nathan. <em>Concurrency Control and Recovery in Database Systems</em>. 1987.
+      </div>
+      <div class="citation-item" id="cite2">
+        [2] Gray, Jim, and Reuter, Andreas. <em>Transaction Processing: Concepts and Techniques</em>. 2nd ed., 1992.
+      </div>
+      <div class="citation-item" id="cite3">
+        [3] Batra, Neera, and A.K. Kapil. “Concurrency Control Algorithms and its Variants: A Survey.” <em>ResearchGate</em>, Nov. 2010, doi:10.1063/1.3526261.
+      </div>
+      <div class="citation-item" id="cite4">
+        [4] “Two-phase locking.” <em>Wikipedia, The Free Encyclopedia</em>, 2 Feb. 2025, <a href="https://en.wikipedia.org/wiki/Two-phase_locking" target="_blank" rel="noopener noreferrer">https://en.wikipedia.org/wiki/Two-phase_locking</a>.
+      </div>
+      <div class="citation-item" id="cite5">
+        [5] “Concurrency control.” <em>Wikipedia, The Free Encyclopedia</em>, 2 Feb. 2025, <a href="https://en.wikipedia.org/wiki/Concurrency_control" target="_blank" rel="noopener noreferrer">https://en.wikipedia.org/wiki/Concurrency_control</a>.
+      </div>
+      <div class="citation-item" id="cite6">
+        [6] Silberschatz, Abraham, Peter B. Galvin, and Greg Gagne. <em>Operating System Concepts</em>. 10th ed., Wiley, 2018. <a href="https://www.wiley.com/en-us/Operating+System+Concepts%2C+10th+Edition-p-9781119456339" target="_blank" rel="noopener noreferrer">Link</a>.
+      </div>
+      <div class="citation-item" id="cite7">
+        [7] Tanenbaum, Andrew S., and Herbert Bos. <em>Modern Operating Systems</em>. 4th ed., Pearson, 2014. <a href="https://www.pearson.com/us/higher-education/program/Tanenbaum-Modern-Operating-Systems-4th-Edition/PGM310154.html" target="_blank" rel="noopener noreferrer">Link</a>.
+      </div>
+      <div class="citation-item" id="cite8">
+        [8] Zhu, Timothy. <em>CMPSC 473</em>. The Pennsylvania State University.
+      </div>
+      <div class="citation-item" id="cite9">
+        [9] Bryant, Randal E., and David R. O’Hallaron. <em>Computer Systems: A Programmer’s Perspective</em>. Carnegie Mellon University.
+      </div>
+      <div class="citation-item" id="cite10">
+        [10] Arpaci-Dusseau, Remzi H., and Andrea C. Arpaci-Dusseau. <em>OS: Three Easy Pieces</em>. <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/" target="_blank" rel="noopener noreferrer">Link</a>.
+      </div>
+      <br />
+      <a href="#sec0" target="_self"><strong>Back to Contents -></strong></a>
+    </div>
+  </section>
+  ...
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const collapsibleHeaders = document.querySelectorAll(".collapsible-header");
+
+    collapsibleHeaders.forEach(header => {
+      header.addEventListener("click", function() {
+        const content = this.nextElementSibling;
+        const icon = this.querySelector(".toggle-icon");
+
+        if (content.style.display === "block") {
+          content.style.display = "none";
+          icon.textContent = "▼";
+        } else {
+          content.style.display = "block";
+          icon.textContent = "▲";
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
