@@ -338,13 +338,16 @@
          <strong>Conservative Two-phase locking(C2PL): </strong><i>Conservative Two-phase locking enforces a strict order on resource acquisition and release. It ensures all required components are acquired before execution. C2PL mechanism "hold locks on all data items at the same time as in conservative two-phase locking"</i> <sup><a href="#cite0" class="sup-link">[0]</a></sup>
         </p>
         <!-- Wrap text and image in a div with flex layout -->
-        <div style="display: flex; align-items: flex-start; gap: 10px;">
-          <figure>
-              <img src="https://i.sstatic.net/apWtc.gif" width="740" height="240" alt="obtained image from flickr" />
-            <figcaption>Figure 1: A modern computer, where multiple tabs are handled efficiently. From  <a href="https://i.sstatic.net/apWtc.gif" target="_blank">Stack Overflow</a></a></figcaption>
-          </figure>
-          <p>If you know anything about Computer Hardware, you’ve likely heard about companies like Nvidia. Their specialized Graphics Processing Units (GPUs) are at the heart of modern computational power, particularly in powering artificial intelligence like ChatGPT and making AAA games. But how does this relate to our kitchen? Just as a chef uses various tools and ingredients to craft a dish, a computer uses hardware innovations and software techniques to perform multiple operations at once.<br /> </p>
-        </div>
+  <div style="text-align: center; margin: 2em 0;">
+    <img 
+      src="https://i.sstatic.net/apWtc.gif" 
+      alt="Demonstration of project in action"
+      width="740" 
+      height="240"
+      style="border: 1px solid #ccc; max-width: 100%; height: auto;"
+    />
+    <p style="font-size: 0.9em; color: #555;">Image courtesy: StackExchange CDN</p>
+  </div>
         <p><strong>Figure 1</strong> is showing how a user manually manages tabs but is oblivious to what is happening under the hood, which is what this article is about.
           Since the audience is high school students I have abstracted away a lot of the prerequisites like caching, role of memory, scheduling algorithms, stacks, heaps, dynamic memory allocation,  and other key concepts in understanding concurrency at a high level. Through the help of animations and analogies, I have tried to simplify basic concurrency and its C2PL optimization.
           </p>
