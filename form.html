@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Format for Continuation of Non-Continuing Projects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* Basic styling for the body */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Container for the form to be converted to PDF */
+        #form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Styling for the table to match the screenshot */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        /* Styling for table cells (td) and headers (th) */
+        td, th {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        /* Centering the main headers */
+        .header-cell {
+            text-align: center;
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }
+        
+        .required-star {
+            color: red;
+            margin-left: 4px;
+        }
+
+        /* Styling for the Ticket Number field */
+        #ticket-container {
+            padding: 10px 0 20px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        #ticket-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        #ticket-number-input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+        }
+
+        /* Styling for the checkbox and its label */
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Space between checkbox and text */
+        }
+        
+        /* Visual cue for disabled textarea and checkbox */
+        textarea:disabled,
+        input[type="checkbox"]:disabled + label {
+            background-color: #f9f9f9;
+            cursor: not-allowed;
+            color: #999;
+        }
+
+        /* Styling for the justification textarea */
+        textarea {
+            width: 100%;
+            height: 150px;
+            border: none;
+            resize: vertical;
+            padding: 5px;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Styling for the word counter */
+        #character-counter {
+            text-align: right;
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        #character-counter.warning {
+            color: #ff6b35;
+        }
+
+        #character-counter.error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        /* Styling for the signature areas */
+        .signature-area {
+            height: 150px; /* Reduced height */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            border: 1px dashed #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 10px; /* Space for name input */
+            background-color: #f9f9f9; /* Visually indicate disabled state */
+            cursor: pointer;
+        }
+        
+        /* Style for active signature area */
+        .signature-area.active {
+             background-color: #ffffff;
+        }
+
+        /* Styling for the signature labels */
+        .signature-label {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        /* Styling for the name input fields */
+        .name-input-container {
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .name-input-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .bba-name-input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Styling for the generate PDF button */
+        #pdf-btn-wrapper {
+            position: relative;
+        }
+
+        #generate-pdf-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        #generate-pdf-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        /* This pseudo-element is a transparent overlay that captures clicks on disabled elements */
+        .is-disabled::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: not-allowed;
+            z-index: 2;
+        }
+
+        #generate-pdf-btn:hover:not(:disabled) {
+            background-color: #0056b3;
+            transform: scale(1.20);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #generate-pdf-btn:active:not(:disabled) {
+            transform: scale(1.08);
+        }
+        
+        .form-alert {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none; /* Hidden by default */
+        }
+
+        /* Style for the h3 and h4 to center them */
+        h3, h4 {
+            text-align: center;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            #generate-pdf-btn {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+            
+            #generate-pdf-btn:hover:not(:disabled) {
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="form-container">
+        <h3>Format for Continuation of Non-Continuing Projects for posting transactions.</h3>
+        <h4><i>Please select the appropriate option which must be signed by the relevant role holder.</i></h4>
+        <p id="form-instruction"><i><u>Please fill the form top to bottom.</u></i></p>
+        <p>This star (<span class="required-star">*</span> ) indicates required fields</p>
+        <div id="ticket-container">
+            <label id="ticket-label" for="ticket-number-input">AR Number/ WBSE Number<span class="required-star">*</span></label>
+            <input type="text" id="ticket-number-input" placeholder="Enter AR/ WBSE Number here...">
+            <div id="ticket-alert" class="form-alert">An AR Number or WBSE Number is required to proceed.</div>
+        </div>
+
+        <table>
+            <tr>
+                <td colspan="2" class="header-cell">Reason for opening (select all that apply)<span class="required-star">*</span></td>
+            </tr>
+            <tr>
+                <td colspan="2"><div id="reason-alert" class="form-alert">Please select a reason.</div></td>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="reason1" name="reason" value="Closing PR/POs" disabled>
+                        <label for="reason1">Closing PR/POs</label>
+                    </div>
+                </td>
+                <td>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="reason2" name="reason" value="GST charge-off to project" disabled>
+                        <label for="reason2">GST charge-off to project</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="reason3" name="reason" value="GRs for STO" disabled>
+                        <label for="reason3">GRs for STO</label>
+                    </div>
+                </td>
+                <td>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="reason4" name="reason" value="GST paid to vendor but not claimed" disabled>
+                        <label for="reason4">GST paid to vendor but not claimed</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                     <div class="checkbox-option">
+                        <input type="checkbox" id="reason5" name="reason" value="Closing of associated Revex internal orders" disabled>
+                        <label for="reason5">Closing of associated Revex internal orders</label>
+                    </div>
+                </td>
+                <td>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="reason6" name="reason" value="Irrecoverable GST debit where capitalization not done" disabled>
+                        <label for="reason6">Irrecoverable GST debit where capitalization not done</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="reason7" name="reason" value="Surplus material transfer outside project" disabled>
+                        <label for="reason7">Surplus material transfer outside project</label>
+                    </div>
+                </td>
+                <td>
+                    <!-- NEW CHECKBOX ADDED HERE -->
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="reason8" name="reason" value="Reversal of FI Liability" disabled>
+                        <label for="reason8">Reversal of FI Liability</label>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2" class="header-cell">Detailed Justification:<span class="required-star">*</span></td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    <textarea id="justification-text" placeholder="Enter your detailed justification here (maximum 500 characters)..." disabled></textarea>
+                    <div id="character-counter">0 characters written, 500 left</div>
+                    <div id="justification-alert" class="form-alert">Please provide a detailed justification.</div>
+                </td>
+            </tr>
+             <tr>
+                <td colspan="2" style="padding: 0; border: none;">
+                    <div id="signature-action-alert" class="form-alert" style="text-align: center; padding: 5px;"></div>
+                </td>
+                <tr>
+                    <td colspan="2" class="header-cell">No new Expenditure / Commitment will be made.</td>
+                </tr>
+            </tr>
+            <tr>
+                <td id="bba-signature-cell">
+                    <div class="signature-label">Signature of BBA</div>
+                    <div id="bba-signature-area" class="signature-area">
+                        </div>
+                    <div id="bba-name-container" class="name-input-container">
+                        <div class="name-input-label">Name of BBA:<span class="required-star">*</span></div>
+                        <input type="text" id="bba-name-input" class="bba-name-input" placeholder="Enter the name of BBA here..." disabled>
+                         <div id="bba-name-alert" class="form-alert">Please enter the Name of BBA.</div>
+                    </div>
+                </td>
+                <td id="finance-signature-cell">
+                    <div class="signature-label">Signature of Finance Role Holder</div>
+                    <div id="finance-signature-area" class="signature-area">
+                        </div>
+                    <div id="finance-name-container" class="name-input-container">
+                        <div class="name-input-label">Name of Finance Member:<span class="required-star">*</span></div>
+                        <input type="text" id="finance-name-input" class="bba-name-input" placeholder="Enter the name of Finance Member here..." disabled>
+                        <div id="finance-name-alert" class="form-alert">Please enter the Name of the Finance Member.</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="pdf-btn-wrapper">
+        <button id="generate-pdf-btn" disabled>Generate PDF to sign</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Element selections
+            const ticketNumberInput = document.getElementById('ticket-number-input');
+            const generatePdfBtn = document.getElementById('generate-pdf-btn');
+            const pdfBtnWrapper = document.getElementById('pdf-btn-wrapper');
+            const reasonCheckboxes = document.querySelectorAll('input[name="reason"]');
+            const justificationText = document.getElementById('justification-text');
+            const characterCounter = document.getElementById('character-counter');
+            const formInstruction = document.getElementById('form-instruction');
+
+            const bbaSignatureCell = document.getElementById('bba-signature-cell');
+            const financeSignatureCell = document.getElementById('finance-signature-cell');
+
+            const bbaSignatureArea = document.getElementById('bba-signature-area');
+            const financeSignatureArea = document.getElementById('finance-signature-area');
+
+            const bbaNameInput = document.getElementById('bba-name-input');
+            const financeNameInput = document.getElementById('finance-name-input');
+    
+            const bbaNameContainer = document.getElementById('bba-name-container');
+            const financeNameContainer = document.getElementById('finance-name-container');
+    
+            const ticketAlert = document.getElementById('ticket-alert');
+            const reasonAlert = document.getElementById('reason-alert');
+            const justificationAlert = document.getElementById('justification-alert');
+            const bbaNameAlert = document.getElementById('bba-name-alert');
+            const financeNameAlert = document.getElementById('finance-name-alert');
+            const signatureActionAlert = document.getElementById('signature-action-alert');
+
+            const MAX_CHARACTERS = 500;
+
+            // Function to update character counter
+            const updateCharacterCounter = () => {
+                const text = justificationText.value;
+                const charCount = text.length;
+                const charsLeft = Math.max(0, MAX_CHARACTERS - charCount);
+                
+                characterCounter.textContent = `${charCount} characters written, ${charsLeft} left`;
+                
+                characterCounter.classList.remove('warning', 'error');
+                
+                if (charCount > MAX_CHARACTERS) {
+                    characterCounter.classList.add('error');
+                } else if (charCount > MAX_CHARACTERS * 0.8) {
+                    characterCounter.classList.add('warning');
+                }
+            };
+
+            // Function to enforce character limit
+            const enforceCharacterLimit = () => {
+                const text = justificationText.value;
+                
+                if (text.length > MAX_CHARACTERS) {
+                    justificationText.value = text.substring(0, MAX_CHARACTERS);
+                }
+                
+                updateCharacterCounter();
+            };
+
+            justificationText.addEventListener('input', enforceCharacterLimit);
+            justificationText.addEventListener('paste', () => {
+                setTimeout(enforceCharacterLimit, 0);
+            });
+
+            const hideAllAlerts = () => {
+                document.querySelectorAll('.form-alert').forEach(alert => alert.style.display = 'none');
+            };
+
+            const lockForm = () => {
+                reasonCheckboxes.forEach(checkbox => checkbox.disabled = true);
+                justificationText.disabled = true;
+
+                generatePdfBtn.disabled = true;
+                pdfBtnWrapper.classList.add('is-disabled');
+                bbaNameInput.disabled = true;
+                bbaNameContainer.classList.add('is-disabled');
+                financeNameInput.disabled = true;
+                financeNameContainer.classList.add('is-disabled');
+            };
+
+            const unlockForm = () => {
+                reasonCheckboxes.forEach(checkbox => checkbox.disabled = false);
+                justificationText.disabled = false;
+            };
+            
+            ticketNumberInput.addEventListener('input', () => {
+                if (ticketNumberInput.value.trim() !== '') {
+                    ticketAlert.style.display = 'none';
+                    unlockForm();
+                } else {
+                    lockForm();
+                }
+            });
+
+            [bbaNameContainer, financeNameContainer, pdfBtnWrapper].forEach(container => {
+                container.addEventListener('click', () => {
+                    if (ticketNumberInput.value.trim() === '') {
+                        alert('Please enter an AR/WBSE Number first to enable the form.');
+                        return;
+                    }
+                    if (container.classList.contains('is-disabled')) {
+                        alert('Please select a reason from the options above to enable this field.');
+                    }
+                });
+            });
+    
+            [bbaSignatureArea, financeSignatureArea].forEach(area => {
+                area.addEventListener('click', () => {
+                    if (ticketNumberInput.value.trim() === '') {
+                        alert('Please enter an AR/WBSE Number first to enable the form.');
+                        return;
+                    }
+                    if (document.querySelectorAll('input[name="reason"]:checked').length === 0) {
+                        const alertMsg = "Select one of the reasons at the top!";
+                        alert(alertMsg);
+                        signatureActionAlert.textContent = alertMsg;
+                        signatureActionAlert.style.display = 'block';
+                    }
+                });
+            });
+
+            reasonCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('click', (event) => {
+                    const clickedCheckbox = event.target;
+                    if (clickedCheckbox.disabled) return;
+                    
+                    const isClickedLeft = parseInt(clickedCheckbox.id.replace('reason', ''), 10) % 2 !== 0;
+                    const currentlyChecked = document.querySelectorAll('input[name="reason"]:checked');
+                    
+                    if (currentlyChecked.length > 0) {
+                        const firstCheckedNum = parseInt(currentlyChecked[0].id.replace('reason', ''), 10);
+                        const isSelectionLeft = firstCheckedNum % 2 !== 0;
+
+                        if (isClickedLeft !== isSelectionLeft) {
+                            event.preventDefault(); 
+                            if (isSelectionLeft) {
+                                alert("A checkbox on the left is selected. Please unselect all left-side options to choose an option from the right.");
+                            } else {
+                                alert("A checkbox on the right is selected. Please unselect all right-side options to choose an option from the left.");
+                            }
+                        }
+                    }
+                });
+
+                checkbox.addEventListener('change', () => {
+                    const checkedBoxes = document.querySelectorAll('input[name="reason"]:checked');
+
+                    if (checkedBoxes.length === 0) {
+                        reasonCheckboxes.forEach(cb => cb.disabled = false);
+                        
+                        bbaSignatureCell.colSpan = 1;
+                        financeSignatureCell.style.display = 'table-cell';
+                        [bbaSignatureArea, financeSignatureArea].forEach(area => area.classList.remove('active'));
+                        [bbaNameInput, financeNameInput].forEach(input => input.disabled = true);
+                        [bbaNameContainer, financeNameContainer].forEach(cont => cont.classList.add('is-disabled'));
+
+                        generatePdfBtn.disabled = true;
+                        pdfBtnWrapper.classList.add('is-disabled');
+                        return;
+                    }
+
+                    const firstCheckedId = checkedBoxes[0].id;
+                    const isSelectionLeft = parseInt(firstCheckedId.replace('reason', ''), 10) % 2 !== 0;
+
+                    reasonCheckboxes.forEach(cb => {
+                        const isCbLeft = parseInt(cb.id.replace('reason', ''), 10) % 2 !== 0;
+                        if (!cb.checked) {
+                           cb.disabled = (isSelectionLeft !== isCbLeft);
+                        }
+                    });
+
+                    hideAllAlerts();
+                    generatePdfBtn.disabled = false;
+                    pdfBtnWrapper.classList.remove('is-disabled');
+
+                    if (isSelectionLeft) { 
+                        bbaSignatureCell.colSpan = 2;
+                        bbaNameInput.disabled = false;
+                        bbaNameContainer.classList.remove('is-disabled');
+                        bbaSignatureArea.classList.add('active');
+                        
+                        financeSignatureCell.style.display = 'none';
+                        financeNameInput.disabled = true;
+                        financeNameContainer.classList.add('is-disabled');
+                        financeSignatureArea.classList.remove('active');
+                        financeNameInput.value = '';
+                    } else { 
+                        bbaSignatureCell.colSpan = 1;
+                        financeSignatureCell.style.display = 'table-cell';
+
+                        bbaNameInput.disabled = false;
+                        bbaNameContainer.classList.remove('is-disabled');
+                        bbaSignatureArea.classList.add('active');
+
+                        financeNameInput.disabled = false;
+                        financeNameContainer.classList.remove('is-disabled');
+                        financeSignatureArea.classList.add('active');
+                    }
+                });
+            });
+    
+            // PDF generation logic
+            generatePdfBtn.addEventListener('click', () => {
+                hideAllAlerts();
+                let isValid = true;
+
+                if (ticketNumberInput.value.trim() === '') {
+                    ticketAlert.style.display = 'block';
+                    isValid = false;
+                }
+
+                if (document.querySelectorAll('input[name="reason"]:checked').length === 0) {
+                    reasonAlert.textContent = "Please select at least one reason.";
+                    reasonAlert.style.display = 'block';
+                    isValid = false;
+                }
+
+                if (justificationText.value.trim() === '') {
+                    justificationAlert.style.display = 'block';
+                    isValid = false;
+                }
+                
+                const charCount = justificationText.value.length;
+                if (charCount > MAX_CHARACTERS) {
+                    justificationAlert.textContent = `Your justification exceeds the ${MAX_CHARACTERS} character limit.`;
+                    justificationAlert.style.display = 'block';
+                    isValid = false;
+                }
+        
+                if (!bbaNameInput.disabled && bbaNameInput.value.trim() === '') {
+                     bbaNameAlert.style.display = 'block';
+                     isValid = false;
+                }
+
+                if (!financeNameInput.disabled && financeNameInput.value.trim() === '') {
+                     financeNameAlert.style.display = 'block';
+                     isValid = false;
+                }
+
+                if (!isValid) {
+                    alert('Please fill out all required fields before generating the PDF.');
+                    return; 
+                }
+        
+                const { jsPDF } = window.jspdf;
+                const html2canvas = window.html2canvas;
+                const formToCapture = document.getElementById('form-container');
+
+                // --- START: HIDE ELEMENTS FOR PDF ---
+                characterCounter.style.display = 'none';
+                formInstruction.style.display = 'none';
+                // --- END: HIDE ELEMENTS FOR PDF ---
+
+                html2canvas(formToCapture, { scale: 2 })
+                    .then(canvas => {
+                        try {
+                            const imgData = canvas.toDataURL('image/png');
+                            const pdf = new jsPDF('p', 'mm', 'a4');
+                            const pdfWidth = pdf.internal.pageSize.getWidth();
+                            const pdfHeight = pdf.internal.pageSize.getHeight();
+                            const canvasWidth = canvas.width;
+                            const canvasHeight = canvas.height;
+                            const ratio = canvasWidth / canvasHeight;
+                            let imgWidth = pdfWidth - 20;
+                            let imgHeight = imgWidth / ratio;
+
+                            if (imgHeight > pdfHeight - 20) {
+                                imgHeight = pdfHeight - 20;
+                                imgWidth = imgHeight * ratio;
+                            }
+
+                            const x = (pdfWidth - imgWidth) / 2;
+                            const y = 10;
+
+                            pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+                            pdf.save('form-submission.pdf');
+
+                        } catch (error) {
+                            console.error("An error occurred during PDF creation:", error);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("html2canvas failed:", err);
+                    })
+                    .finally(() => {
+                        // --- START: SHOW ELEMENTS AGAIN ---
+                        characterCounter.style.display = 'block';
+                        formInstruction.style.display = 'block';
+                        // --- END: SHOW ELEMENTS AGAIN ---
+                    });
+            });
+
+            lockForm();
+            updateCharacterCounter();
+        });
+    </script>
+
+</body>
+</html>
