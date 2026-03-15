@@ -45,10 +45,9 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 #loader{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
 #loader.hidden{display:none}
 .loader-logo{font-family:var(--disp);font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
-.loader-msg{font-size:.72rem;color:var(--muted);letter-spacing:.08em;min-height:1.2em;text-align:center}
+.loader-msg{font-size:.72rem;color:var(--muted);letter-spacing:.08em;min-height:1.2em;text-align:center;max-width:300px}
 .loader-bar{width:220px;height:2px;background:var(--surface2);border-radius:99px;overflow:hidden}
-.loader-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;animation:loadfill 2s ease forwards}
-@keyframes loadfill{from{width:0}to{width:100%}}
+.loader-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;width:0;transition:width .4s ease}
 
 /* Tooltip */
 #hm-tooltip{position:fixed;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 12px;font-size:.7rem;pointer-events:none;z-index:200;display:none;white-space:nowrap;color:var(--text)}
@@ -60,7 +59,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:52px;padding-bottom:20px;border-bottom:1px solid var(--border)}
 .logo{font-family:var(--disp);font-weight:800;font-size:1.3rem;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
 .logo-accent{color:var(--accent)}
-.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);transition:background .4s,box-shadow .4s}
 .logo-dot.red{background:var(--red);box-shadow:0 0 8px var(--red)}
 .header-right{display:flex;gap:10px;align-items:center}
 .sync-label{font-size:.68rem;color:var(--muted)}
@@ -129,8 +128,9 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .c-repo{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 8px;font-size:.64rem;color:var(--accent2)}
 .c-sha{font-style:italic}
 
-/* Needs commit */
+/* Needs commit / today repos */
 .nc-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);margin-bottom:9px;opacity:0;transition:border-color .2s}
+.nc-item:last-child{margin-bottom:0}
 .nc-item:hover{border-color:var(--amber)}
 .nc-dot{width:9px;height:9px;border-radius:50%;background:var(--amber);flex-shrink:0;box-shadow:0 0 6px var(--amber)}
 .nc-dot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
@@ -156,7 +156,10 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .lang-track{height:5px;background:var(--surface2);border-radius:99px;overflow:hidden}
 .lang-fill{height:100%;border-radius:99px;width:0;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
 
-/* Scrollbar */
+/* Debug panel */
+.debug-panel{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:16px 20px;margin-bottom:22px;font-size:.72rem;color:var(--amber);line-height:1.8;display:none}
+.debug-panel.visible{display:block}
+
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
@@ -164,11 +167,10 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 </head>
 <body>
 
-<!-- Setup -->
 <div id="setup-overlay">
   <div class="setup-card">
     <h2>streak tracker</h2>
-    <p>Connect your GitHub account to track all your repos — public and private. Your Personal Access Token is stored only in your browser's localStorage and never sent anywhere except directly to GitHub's API.</p>
+    <p>Connect your GitHub account to track all repos — public and private. Your token is stored only in your browser's localStorage and is sent directly to GitHub's API, nowhere else.</p>
     <div class="setup-field">
       <label>GitHub Username</label>
       <input type="text" id="inp-user" placeholder="udogg" autocomplete="off"/>
@@ -186,7 +188,6 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
   </div>
 </div>
 
-<!-- Loader -->
 <div id="loader">
   <div class="loader-logo">streak tracker</div>
   <div class="loader-msg" id="loader-msg">initialising...</div>
@@ -195,7 +196,6 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 
 <div id="hm-tooltip"></div>
 
-<!-- App -->
 <div id="app">
   <header>
     <div class="logo">
@@ -204,12 +204,15 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
     </div>
     <div class="header-right">
       <span class="sync-label" id="sync-lbl">—</span>
+      <button class="btn-sm" id="btn-debug">🔍 debug</button>
       <button class="btn-sm" id="btn-refresh">↻ refresh</button>
       <button class="btn-sm" id="btn-settings">⚙ settings</button>
     </div>
   </header>
 
-  <!-- Hero -->
+  <!-- Debug panel — shows what the API actually returned so you can verify -->
+  <div class="debug-panel" id="debug-panel"></div>
+
   <div class="today-hero" id="hero">
     <div class="glow"></div>
     <div class="hero-label">today · <span id="hero-date-inline"></span></div>
@@ -221,28 +224,23 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
     </div>
   </div>
 
-  <!-- Stats -->
   <div class="stats-row">
     <div class="stat-card"><span class="stat-icon">🔥</span><div class="stat-val" id="s-streak">—</div><div class="stat-lbl">current streak</div></div>
     <div class="stat-card"><span class="stat-icon">⚡</span><div class="stat-val" id="s-longest">—</div><div class="stat-lbl">longest streak</div></div>
     <div class="stat-card"><span class="stat-icon">📦</span><div class="stat-val" id="s-total">—</div><div class="stat-lbl">commits · year</div></div>
     <div class="stat-card"><span class="stat-icon">🗂</span><div class="stat-val" id="s-repos">—</div><div class="stat-lbl">active repos</div></div>
     <div class="stat-card"><span class="stat-icon">📅</span><div class="stat-val" id="s-week">—</div><div class="stat-lbl">this week</div></div>
-    <div class="stat-card"><span class="stat-icon">🎯</span><div class="stat-val" id="s-pct">—</div><div class="stat-lbl">days hit · year</div></div>
+    <div class="stat-card"><span class="stat-icon">🎯</span><div class="stat-val" id="s-days">—</div><div class="stat-lbl">days with commits</div></div>
   </div>
 
-  <!-- Heatmap -->
   <div class="panel" style="margin-bottom:22px">
     <div class="panel-title">contribution heatmap · past 52 weeks</div>
     <div id="heatmap-wrap">
       <div class="hm-outer">
         <div class="hm-days-col">
-          <div class="hm-day-lbl">Mon</div>
-          <div class="hm-day-lbl"></div>
-          <div class="hm-day-lbl">Wed</div>
-          <div class="hm-day-lbl"></div>
-          <div class="hm-day-lbl">Fri</div>
-          <div class="hm-day-lbl"></div>
+          <div class="hm-day-lbl">Mon</div><div class="hm-day-lbl"></div>
+          <div class="hm-day-lbl">Wed</div><div class="hm-day-lbl"></div>
+          <div class="hm-day-lbl">Fri</div><div class="hm-day-lbl"></div>
           <div class="hm-day-lbl">Sun</div>
         </div>
         <div class="hm-right">
@@ -253,7 +251,6 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
     </div>
   </div>
 
-  <!-- Commits + Sidebar -->
   <div class="grid-2">
     <div class="panel">
       <div class="panel-title">recent commits</div>
@@ -271,7 +268,6 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
     </div>
   </div>
 
-  <!-- Languages + All repos -->
   <div class="grid-2-equal">
     <div class="panel">
       <div class="panel-title">languages · all repos</div>
@@ -288,7 +284,21 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 const LANG_COLORS={JavaScript:'#f7df1e',TypeScript:'#3178c6',Python:'#3572A5',PHP:'#4F5D95',HTML:'#e34c26',CSS:'#563d7c',Vue:'#41b883',Go:'#00ADD8',Rust:'#dea584',Java:'#b07219','C#':'#178600',Ruby:'#701516',Swift:'#ffac45',Kotlin:'#A97BFF',Dart:'#00B4AB',Shell:'#89e051',Blade:'#f7523f',SCSS:'#c6538c',Dockerfile:'#384d54','C++':'#f34b7d',C:'#555555'};
 const API='https://api.github.com';
 let cfg={username:'',pat:''};
-let S={repos:[],commits:[],byDay:{},langs:{},repoLast:{}};
+
+// ── BUG FIX 1: Always compute today in LOCAL time, never UTC ──────────────
+function localToday(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+let S={
+  repos:[],
+  displayCommits:[],  // capped array for UI rendering
+  byDay:{},           // UNCAPPED — every commit counts toward streak
+  langs:{},
+  repoLast:{},        // repoName -> local-date string of last commit
+  debugLines:[]
+};
 
 // ── Boot ──────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
@@ -298,6 +308,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('btn-connect').onclick=saveSetup;
   document.getElementById('btn-refresh').onclick=()=>boot();
   document.getElementById('btn-settings').onclick=showSetup;
+  document.getElementById('btn-debug').onclick=toggleDebug;
   document.addEventListener('mousemove',e=>{
     const t=document.getElementById('hm-tooltip');
     t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY-36)+'px';
@@ -319,26 +330,44 @@ function showSetup(){
 }
 function hideSetup(){document.getElementById('setup-overlay').classList.add('hidden');}
 function showErr(m){const e=document.getElementById('setup-err');e.textContent=m;e.classList.add('visible');}
+function toggleDebug(){
+  const p=document.getElementById('debug-panel');
+  p.classList.toggle('visible');
+}
 
 // ── Loader ────────────────────────────────────────────────────────────────
-let loaderProgress=0;
-function setMsg(m){document.getElementById('loader-msg').textContent=m;}
+let _progress=0;
+function setMsg(m,pct){
+  document.getElementById('loader-msg').textContent=m;
+  if(pct!==undefined){
+    _progress=pct;
+    document.getElementById('loader-fill').style.width=pct+'%';
+  }
+}
 function showLoader(){
-  const el=document.getElementById('loader');el.classList.remove('hidden');
-  const f=document.getElementById('loader-fill');
-  f.style.animation='none';void f.offsetHeight;f.style.animation='loadfill 3s ease forwards';
+  document.getElementById('loader').classList.remove('hidden');
+  document.getElementById('loader-fill').style.width='0%';
+  _progress=0;
 }
 function hideLoader(){document.getElementById('loader').classList.add('hidden');}
 
 // ── GH API ────────────────────────────────────────────────────────────────
 async function gh(path){
-  const r=await fetch(API+path,{headers:{'Authorization':'Bearer '+cfg.pat,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||'HTTP '+r.status);}
+  const r=await fetch(API+path,{headers:{
+    'Authorization':'Bearer '+cfg.pat,
+    'Accept':'application/vnd.github+json',
+    'X-GitHub-Api-Version':'2022-11-28'
+  }});
+  if(!r.ok){
+    const e=await r.json().catch(()=>({}));
+    throw new Error(e.message||'HTTP '+r.status);
+  }
   return r.json();
 }
+
 async function ghAll(path){
   let page=1,out=[];
-  while(page<=10){
+  while(page<=15){
     const sep=path.includes('?')?'&':'?';
     const d=await gh(path+sep+'per_page=100&page='+page);
     if(!Array.isArray(d)||!d.length)break;
@@ -352,25 +381,48 @@ async function ghAll(path){
 // ── Main ──────────────────────────────────────────────────────────────────
 async function boot(){
   showLoader();
-  S={repos:[],commits:[],byDay:{},langs:{},repoLast:{}};
+  S={repos:[],displayCommits:[],byDay:{},langs:{},repoLast:{},debugLines:[]};
   try{
-    setMsg('authenticating...');
+    setMsg('authenticating...',5);
     document.getElementById('h-user').textContent=cfg.username;
-    setMsg('fetching repositories...');
-    const repos=await ghAll('/user/repos?sort=pushed&type=all');
-    S.repos=repos.filter(r=>!r.archived&&!r.fork);
-    setMsg('scanning '+S.repos.length+' repositories...');
-    const since=new Date();since.setFullYear(since.getFullYear()-1);
+
+    setMsg('fetching repositories...',10);
+    // BUG FIX 2: use /user/repos (authenticated) to get private repos too
+    const repos=await ghAll('/user/repos?sort=pushed&type=owner&affiliation=owner');
+    S.repos=repos.filter(r=>!r.archived);
+    S.debugLines.push('repos found: '+S.repos.length+' ('+S.repos.filter(r=>r.private).length+' private)');
+
+    const since=new Date();
+    since.setFullYear(since.getFullYear()-1);
     const sinceISO=since.toISOString();
+    S.debugLines.push('scanning since: '+sinceISO.slice(0,10));
+    S.debugLines.push('local today: '+localToday());
+    S.debugLines.push('UTC today: '+new Date().toISOString().slice(0,10));
+
     const BATCH=4;
     for(let i=0;i<S.repos.length;i+=BATCH){
-      setMsg('reading commits... ('+Math.min(i+BATCH,S.repos.length)+'/'+S.repos.length+')');
+      const pct=10+Math.round((i/S.repos.length)*80);
+      setMsg('reading commits... ('+Math.min(i+BATCH,S.repos.length)+'/'+S.repos.length+')',pct);
       await Promise.all(S.repos.slice(i,i+BATCH).map(r=>fetchRepo(r,sinceISO)));
     }
-    S.commits.sort((a,b)=>new Date(b.date)-new Date(a.date));
-    setMsg('rendering...');
+
+    // Sort display commits newest first
+    S.displayCommits.sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+    const t=localToday();
+    S.debugLines.push('byDay[today]: '+(S.byDay[t]||0)+' commits');
+    S.debugLines.push('total days with commits: '+Object.keys(S.byDay).length);
+
+    // Show top 5 most recent days found
+    const recentDays=Object.keys(S.byDay).sort().reverse().slice(0,5);
+    S.debugLines.push('most recent days: '+recentDays.join(', '));
+
+    setMsg('rendering...',95);
     renderAll();
+    renderDebug();
+
     document.getElementById('sync-lbl').textContent='synced '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    setMsg('done',100);
     hideLoader();
     revealApp();
   }catch(e){
@@ -382,26 +434,71 @@ async function boot(){
 
 async function fetchRepo(repo,sinceISO){
   try{
-    const commits=await ghAll('/repos/'+cfg.username+'/'+repo.name+'/commits?author='+cfg.username+'&since='+sinceISO);
+    // BUG FIX 2: NO author filter — fetch all commits then count them all.
+    // The author= filter only works if git email matches GitHub email exactly.
+    // Since we own these repos, all commits on the default branch count.
+    const commits=await ghAll(
+      '/repos/'+cfg.username+'/'+repo.name+'/commits?since='+sinceISO
+    );
+
+    let repoLatestDate=null;
+
     for(const c of commits){
-      const d=(c.commit.author.date||c.commit.committer.date||'').slice(0,10);
-      if(!d)continue;
-      S.byDay[d]=(S.byDay[d]||0)+1;
-      if(S.commits.length<300)S.commits.push({sha:c.sha.slice(0,7),msg:c.commit.message.split('\n')[0],repo:repo.name,date:c.commit.author.date||c.commit.committer.date,url:c.html_url});
+      // Use author date if available, fall back to committer date
+      const isoDate=c.commit?.author?.date||c.commit?.committer?.date;
+      if(!isoDate)continue;
+
+      // BUG FIX 1: Convert ISO date string to LOCAL date, not UTC
+      const localDate=isoToLocalDate(isoDate);
+
+      // byDay is ALWAYS incremented — no cap — so streak is always accurate
+      S.byDay[localDate]=(S.byDay[localDate]||0)+1;
+
+      // Track the most recent commit date for this repo
+      if(!repoLatestDate||isoDate>repoLatestDate)repoLatestDate=isoDate;
+
+      // displayCommits is capped at 400 for UI performance
+      if(S.displayCommits.length<400){
+        S.displayCommits.push({
+          sha:c.sha.slice(0,7),
+          msg:(c.commit?.message||'').split('\n')[0],
+          repo:repo.name,
+          date:isoDate,
+          url:c.html_url
+        });
+      }
     }
-    if(commits.length>0)S.repoLast[repo.name]=commits[0].commit.author.date||commits[0].commit.committer.date;
-  }catch(e){}
+
+    if(repoLatestDate){
+      // Store as local date for "last committed" display
+      S.repoLast[repo.name]=repoLatestDate;
+    }
+
+    if(commits.length>0){
+      S.debugLines.push(repo.name+': '+commits.length+' commits');
+    }
+
+  }catch(err){
+    S.debugLines.push(repo.name+': ERROR — '+err.message);
+  }
+
+  // Languages
   try{
     const langs=await gh('/repos/'+cfg.username+'/'+repo.name+'/languages');
     for(const[l,b]of Object.entries(langs))S.langs[l]=(S.langs[l]||0)+b;
   }catch(e){}
 }
 
-// ── Render ────────────────────────────────────────────────────────────────
-function today(){return new Date().toISOString().slice(0,10);}
+// ── BUG FIX 1: ISO → local date ──────────────────────────────────────────
+// Converts "2025-03-15T18:30:00Z" to the local calendar date, e.g. "2025-03-16" in IST
+function isoToLocalDate(iso){
+  const d=new Date(iso);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
 
+// ── Render ────────────────────────────────────────────────────────────────
 function renderAll(){
-  const t=today();
+  const t=localToday();
   const committed=(S.byDay[t]||0)>0;
   renderHero(committed,t);
   renderStats(committed,t);
@@ -411,9 +508,13 @@ function renderAll(){
   renderTodayRepos(t);
   renderLangs();
   renderAllRepos(t);
-  // Status dot
   const dot=document.getElementById('status-dot');
   dot.className='logo-dot'+(committed?'':' red');
+}
+
+function renderDebug(){
+  const p=document.getElementById('debug-panel');
+  p.innerHTML='<strong>🔍 debug info</strong> (click "debug" button to toggle)<br>'+S.debugLines.map(l=>'→ '+l).join('<br>');
 }
 
 function renderHero(committed,t){
@@ -431,20 +532,23 @@ function renderHero(committed,t){
 }
 
 function calcStreaks(){
-  const t=new Date(today());
+  const t=localToday();
+  const tDate=new Date(t+'T12:00:00'); // noon local to avoid DST edge cases
   let cur=0,run=0;
   for(let i=0;i<=400;i++){
-    const d=new Date(t);d.setDate(d.getDate()-i);
-    const s=d.toISOString().slice(0,10);
-    if(S.byDay[s]){run++;if(i===0||run>1)cur=run;}
+    const d=new Date(tDate);d.setDate(d.getDate()-i);
+    const s=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if(S.byDay[s]){run++;cur=run;}
     else{if(i===0){cur=0;run=0;}else break;}
   }
-  // Longest
+  // Longest streak: scan all days chronologically
   const days=Object.keys(S.byDay).sort();
   let max=0,cr=0,prev=null;
   for(const d of days){
-    if(prev){const diff=(new Date(d)-new Date(prev))/86400000;cr=diff===1?cr+1:1;}
-    else cr=1;
+    if(prev){
+      const diff=Math.round((new Date(d+'T12:00:00')-new Date(prev+'T12:00:00'))/86400000);
+      cr=diff===1?cr+1:1;
+    }else cr=1;
     max=Math.max(max,cr);prev=d;
   }
   return{cur,max};
@@ -456,12 +560,13 @@ function renderStats(committed,t){
   document.getElementById('s-longest').textContent=max;
   document.getElementById('s-total').textContent=Object.values(S.byDay).reduce((a,b)=>a+b,0);
   const cut=new Date();cut.setDate(cut.getDate()-30);
-  document.getElementById('s-repos').textContent=S.repos.filter(r=>{const l=S.repoLast[r.name];return l&&new Date(l)>=cut;}).length;
+  document.getElementById('s-repos').textContent=S.repos.filter(r=>{
+    const l=S.repoLast[r.name];return l&&new Date(l)>=cut;
+  }).length;
   const wa=new Date();wa.setDate(wa.getDate()-7);
-  document.getElementById('s-week').textContent=Object.entries(S.byDay).filter(([d])=>new Date(d)>=wa).reduce((a,[,b])=>a+b,0);
-  // % days with commits in past year
-  const total=Object.keys(S.byDay).length;
-  document.getElementById('s-pct').textContent=total+'d';
+  document.getElementById('s-week').textContent=Object.entries(S.byDay)
+    .filter(([d])=>new Date(d+'T12:00:00')>=wa).reduce((a,[,b])=>a+b,0);
+  document.getElementById('s-days').textContent=Object.keys(S.byDay).length+'d';
 }
 
 function renderHeatmap(){
@@ -471,9 +576,9 @@ function renderHeatmap(){
   const t=new Date();
   const start=new Date(t);start.setFullYear(start.getFullYear()-1);
   const dow=(start.getDay()+6)%7;start.setDate(start.getDate()-dow);
-  const cells=[];let col=0;const seen={};
+  const cells=[];const seen={};
   for(const d=new Date(start);d<=t;d.setDate(d.getDate()+1)){
-    const s=d.toISOString().slice(0,10);
+    const s=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
     const cnt=S.byDay[s]||0;
     const l=cnt===0?0:cnt<3?1:cnt<7?2:cnt<12?3:4;
     const cell=document.createElement('div');
@@ -481,7 +586,7 @@ function renderHeatmap(){
     cell.addEventListener('mouseenter',e=>{
       const tt=document.getElementById('hm-tooltip');
       const c=e.currentTarget;
-      const dd=new Date(c.dataset.date+'T00:00:00');
+      const dd=new Date(c.dataset.date+'T12:00:00');
       tt.textContent=c.dataset.cnt+' commit'+(c.dataset.cnt!='1'?'s':'')+' · '+dd.toLocaleDateString('default',{month:'short',day:'numeric',year:'numeric'});
       tt.style.display='block';
     });
@@ -489,10 +594,10 @@ function renderHeatmap(){
     hm.appendChild(cell);cells.push(cell);
     const dayOfWeek=(d.getDay()+6)%7;
     if(dayOfWeek===0){
-      const mk=d.toLocaleString('default',{month:'short'})+d.getMonth();
-      if(!seen[mk]){seen[mk]=1;const sp=document.createElement('div');sp.className='hm-mon-lbl';sp.textContent=d.toLocaleString('default',{month:'short'});months.appendChild(sp);}
-      else{const sp=document.createElement('div');sp.className='hm-mon-lbl';months.appendChild(sp);}
-      col++;
+      const mk=d.toLocaleString('default',{month:'short'})+'-'+d.getMonth();
+      const sp=document.createElement('div');sp.className='hm-mon-lbl';
+      if(!seen[mk]){seen[mk]=1;sp.textContent=d.toLocaleString('default',{month:'short'});}
+      months.appendChild(sp);
     }
   }
   gsap.fromTo(cells,{opacity:0,scale:.3},{opacity:1,scale:1,duration:.35,stagger:{each:.0015,from:'start'},ease:'back.out(1.2)'});
@@ -500,7 +605,7 @@ function renderHeatmap(){
 
 function renderCommits(){
   const list=document.getElementById('commits-list');list.innerHTML='';
-  const recent=S.commits.slice(0,40);
+  const recent=S.displayCommits.slice(0,40);
   if(!recent.length){list.innerHTML='<div style="color:var(--muted);font-size:.78rem">No commits found in the past year.</div>';return;}
   recent.forEach(c=>{
     const el=document.createElement('div');el.className='commit-item';
@@ -515,12 +620,13 @@ function renderNeeds(t){
   const cut=new Date();cut.setDate(cut.getDate()-30);
   const active=S.repos.filter(r=>{
     const l=S.repoLast[r.name];
-    return l&&new Date(l)>=cut&&!S.commits.some(c=>c.repo===r.name&&c.date.slice(0,10)===t);
+    if(!l)return false;
+    const committed=S.displayCommits.some(c=>c.repo===r.name&&isoToLocalDate(c.date)===t);
+    return new Date(l)>=cut&&!committed;
   });
   if(!active.length){list.innerHTML='<div style="color:var(--green);font-size:.76rem">✓ All active repos touched today.</div>';return;}
   active.slice(0,8).forEach(r=>{
-    const l=S.repoLast[r.name];
-    const days=Math.floor((new Date()-new Date(l))/86400000);
+    const days=Math.floor((Date.now()-new Date(S.repoLast[r.name]))/86400000);
     const el=document.createElement('div');el.className='nc-item';
     el.innerHTML='<div class="nc-dot"></div><div class="nc-name">'+esc(r.name)+'</div><div class="nc-age">'+days+'d ago</div>';
     list.appendChild(el);
@@ -530,10 +636,12 @@ function renderNeeds(t){
 
 function renderTodayRepos(t){
   const list=document.getElementById('today-repos');list.innerHTML='';
-  const todayRepos=[...new Set(S.commits.filter(c=>c.date.slice(0,10)===t).map(c=>c.repo))];
+  const todayRepos=[...new Set(
+    S.displayCommits.filter(c=>isoToLocalDate(c.date)===t).map(c=>c.repo)
+  )];
   if(!todayRepos.length){list.innerHTML='<div style="color:var(--muted);font-size:.76rem">No repos committed to today yet.</div>';return;}
   todayRepos.forEach(name=>{
-    const cnt=S.commits.filter(c=>c.repo===name&&c.date.slice(0,10)===t).length;
+    const cnt=S.displayCommits.filter(c=>c.repo===name&&isoToLocalDate(c.date)===t).length;
     const el=document.createElement('div');el.className='nc-item';el.style.opacity=1;
     el.innerHTML='<div class="nc-dot green"></div><div class="nc-name">'+esc(name)+'</div><div class="nc-age">'+cnt+' commit'+(cnt!==1?'s':'')+'</div>';
     list.appendChild(el);
@@ -563,7 +671,7 @@ function renderAllRepos(t){
   }).slice(0,20);
   sorted.forEach(r=>{
     const l=S.repoLast[r.name];
-    const committed=S.commits.some(c=>c.repo===r.name&&c.date.slice(0,10)===t);
+    const committed=S.displayCommits.some(c=>c.repo===r.name&&isoToLocalDate(c.date)===t);
     const active=l&&new Date(l)>=cut30;
     const badge=committed?'<span class="badge badge-today">today</span>':active?'<span class="badge badge-needs">needs commit</span>':'<span class="badge badge-idle">idle</span>';
     const lang=r.language||'';
