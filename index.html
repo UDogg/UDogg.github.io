@@ -54,7 +54,8 @@
             pointer-events: none;
             z-index: 9999;
             mix-blend-mode: difference;
-            transition: transform 0.1s;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, border-color 0.2s;
         }
 
         .cursor-follower {
@@ -66,7 +67,8 @@
             pointer-events: none;
             z-index: 9998;
             opacity: 0.5;
-            transition: transform 0.3s ease-out;
+            transform: translate(-50%, -50%);
+            transition: left 0.12s ease-out, top 0.12s ease-out;
         }
 
         /* Matrix Rain Background */
@@ -128,19 +130,20 @@
             height: 100%;
             background: repeating-linear-gradient(
                 0deg,
-                rgba(0, 0, 0, 0.15),
-                rgba(0, 0, 0, 0.15) 1px,
+                rgba(0, 0, 0, 0.12),
+                rgba(0, 0, 0, 0.12) 1px,
                 transparent 1px,
-                transparent 2px
+                transparent 4px   /* was 2px — wider gap makes stripes less aggressive */
             );
             pointer-events: none;
             z-index: 9997;
-            animation: scanline 10s linear infinite;
+            animation: scanline 8s linear infinite;
+            will-change: background-position;
         }
 
         @keyframes scanline {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(10px); }
+            0%   { background-position: 0 0; }
+            100% { background-position: 0 4px; } /* match the repeat size */
         }
 
         /* Navigation */
@@ -343,7 +346,7 @@
             overflow: hidden;
         }
 
-        .typing-text {
+        /* .typing-text {
             font-family: 'JetBrains Mono', monospace;
             font-size: clamp(1rem, 2.5vw, 1.5rem);
             color: var(--neon-cyan);
@@ -357,6 +360,23 @@
         @keyframes typing {
             from { width: 0 }
             to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--neon-cyan); }
+        } */
+
+        .typing-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: var(--neon-cyan);
+            border-right: 3px solid var(--neon-cyan);
+            white-space: nowrap;
+            display: inline-block;
+            text-shadow: 0 0 10px var(--neon-cyan);
+            animation: blink-caret 0.75s step-end infinite;
+            min-height: 1.5em;
         }
 
         @keyframes blink-caret {
@@ -383,20 +403,10 @@
         }
 
         @keyframes emojiFall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.6;
-            }
-            90% {
-                opacity: 0.6;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
+            0%   { transform: translateY(0) rotate(0deg);    opacity: 0; }
+            8%   { opacity: 0.7; }
+            92%  { opacity: 0.7; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
         }
 
         .cta-buttons {
@@ -1678,13 +1688,14 @@
         .bar {
             width: 4px;
             background: linear-gradient(to top, var(--neon-pink), var(--neon-cyan));
-            animation: visualizerBar 1s ease-in-out infinite;
             border-radius: 2px;
+            animation: visualizerBar var(--dur, 1s) ease-in-out infinite alternate;
+            transform-origin: bottom;
         }
 
         @keyframes visualizerBar {
-            0%, 100% { height: 20px; }
-            50% { height: 80px; }
+            from { height: var(--min-h, 8px);  }
+            to   { height: var(--max-h, 60px); }
         }
         .stack-category {
     min-height: 500px; /* Keep the larger value */
@@ -1768,8 +1779,9 @@
             </div>
             <p class="hero-subtitle">
                 Building elegant systems that bridge logic and creativity. 
-                From <span class="highlight">systems programming</span> to <span class="highlight">modern web apps</span> to <span class="highlight">AI integration</span>. 
-                Graduate from Penn State University <span class="emoji-burst">👁️❤️🧑‍💻</span>
+                From <span class="highlight">systems programming</span> to <span class="highlight">modern web apps</span> to <span class="highlight">AI integration</span>. <br />
+                <h2>Graduate from Penn State University, University Park</h2><br />
+                <span class="emoji-burst">👁️❤️🧑‍💻</span>
             </p>
             <div class="cta-buttons">
                 <a href="https://threejs-black.vercel.app" target="_blank" class="btn btn-primary btn-glow">
@@ -2482,18 +2494,50 @@
             }, 1500);
         });
 
+        // Typewriter effect
+        const typingEl = document.querySelector('.typing-text');
+        const typingPhrases = [
+            'Systems Architect & Full-Stack Developer',
+            'NLP Enthusiast & AI Integrator',
+            'Penn State CS Graduate',
+            'Open Source Builder',
+            'C++ & Rust Systems Programmer',
+        ];
+        let tpIndex = 0, tpChar = 0, tpDeleting = false;
+
+        function typeLoop() {
+            const phrase = typingPhrases[tpIndex];
+            if (!tpDeleting) {
+                typingEl.textContent = phrase.slice(0, ++tpChar);
+                if (tpChar === phrase.length) {
+                    // Pause at full text, then start deleting
+                    setTimeout(() => { tpDeleting = true; typeLoop(); }, 1800);
+                    return;
+                }
+                setTimeout(typeLoop, 65);
+            } else {
+                typingEl.textContent = phrase.slice(0, --tpChar);
+                if (tpChar === 0) {
+                    tpDeleting = false;
+                    tpIndex = (tpIndex + 1) % typingPhrases.length;
+                    setTimeout(typeLoop, 400);
+                    return;
+                }
+                setTimeout(typeLoop, 35); // Delete faster than type
+            }
+        }
+        typeLoop();
+
         // Custom cursor
         const cursor = document.getElementById('cursor');
         const cursorFollower = document.getElementById('cursorFollower');
 
         document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            
-            setTimeout(() => {
-                cursorFollower.style.left = e.clientX - 10 + 'px';
-                cursorFollower.style.top = e.clientY - 10 + 'px';
-            }, 100);
+            cursor.style.top  = e.clientY + 'px';
+            cursorFollower.style.left = e.clientX + 'px';
+            cursorFollower.style.top  = e.clientY + 'px';
+            // The CSS transition on the follower provides the lag naturally
         });
 
         document.addEventListener('mousedown', () => {
@@ -2565,13 +2609,19 @@
             const emoji = document.createElement('div');
             emoji.className = 'emoji-rain';
             emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-            emoji.style.left = Math.random() * 100 + '%';
-            emoji.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            document.querySelector('.hero').appendChild(emoji);
-            
-            setTimeout(() => emoji.remove(), 5000);
+            emoji.style.cssText = `
+                position: fixed;
+                left: ${Math.random() * 100}vw;
+                top: -60px;
+                font-size: 1.8rem;
+                pointer-events: none;
+                z-index: 9996;
+                animation: emojiFall ${Math.random() * 3 + 2}s linear forwards;
+            `;
+            document.body.appendChild(emoji);
+            // Remove after animation ends — 'forwards' fill means it stays otherwise
+            emoji.addEventListener('animationend', () => emoji.remove());
         }
-        setInterval(createEmojiRain, 500);
 
         // Section title animations
         gsap.utils.toArray('.section-title').forEach(title => {
@@ -2699,40 +2749,37 @@
             delay: i * 0.03,  // Faster stagger: 15 cards × 0.03s = 0.45s total
             ease: 'back.out(1.7)'
         });
-        gsap.registerPlugin(ScrollTrigger);
 
         function animateStack(selector) {
             const items = document.querySelectorAll(selector + " .stack-item");
-            const itemHeight = 70; // Match your CSS height
-            const gap = 10; // Space between items
+            const itemHeight = 70;
+            const gap = 10;
 
-            // Set initial state (scattered above viewport)
-            gsap.set(items, {
-                y: gsap.utils.random(-400, -100), // Random start positions above
-                rotation: gsap.utils.random(-45, 45), // Random rotation
-                opacity: 0
-            });
+            // Don't set initial state until ScrollTrigger fires — avoids pre-positioning items
+            ScrollTrigger.create({
+                trigger: selector,
+                start: "top 75%",
+                once: true,
+                onEnter: () => {
+                    // Set scattered start positions right before animating
+                    gsap.set(items, {
+                        y: () => gsap.utils.random(-400, -100),
+                        rotation: () => gsap.utils.random(-45, 45),
+                        opacity: 0
+                    });
 
-            // Animate to stacked position
-            gsap.to(items, {
-                y: (index) => index * (itemHeight + gap), // Stack vertically
-                rotation: gsap.utils.random(-5, 5), // Slight random tilt for realism
-                opacity: 1,
-                duration: 1.2,
-                stagger: {
-                    each: 0.1,
-                    from: "start"
-                },
-                ease: "elastic.out(1, 0.5)",
-                scrollTrigger: {
-                    trigger: selector,
-                    start: "top 75%",
-                    toggleActions: "play none none none"
+                    gsap.to(items, {
+                        y: (index) => index * (itemHeight + gap),
+                        rotation: () => gsap.utils.random(-4, 4),
+                        opacity: 1,
+                        duration: 1.2,
+                        stagger: { each: 0.08, from: "start" },
+                        ease: "elastic.out(1, 0.5)"
+                    });
                 }
             });
         }
 
-        // Initialize
         animateStack("#lang-stack");
         animateStack("#framework-stack");
 
@@ -2753,22 +2800,35 @@
         }
 
         function drawMatrix() {
-            matrixCtx.fillStyle = 'rgba(5, 5, 5, 0.05)';
+            matrixCtx.fillStyle = 'rgba(5, 5, 5, 0.15)';  // was 0.05 — needs to be stronger
             matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 
-            matrixCtx.fillStyle = '#0f0';
-            matrixCtx.font = matrixFontSize + 'px monospace';
-
             for (let i = 0; i < matrixDrops.length; i++) {
+                // Vary brightness: lead character is bright white, trail fades to green
+                const isLead = matrixDrops[i] > 0 && Math.random() > 0.9;
+                matrixCtx.fillStyle = isLead ? '#fff' : '#0f0';
+                matrixCtx.font = matrixFontSize + 'px monospace';
                 const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
                 matrixCtx.fillText(text, i * matrixFontSize, matrixDrops[i] * matrixFontSize);
 
+                // Reset when past bottom — consistent units (rows, not pixels)
                 if (matrixDrops[i] * matrixFontSize > matrixCanvas.height && Math.random() > 0.975) {
                     matrixDrops[i] = 0;
                 }
                 matrixDrops[i]++;
             }
         }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            matrixCanvas.width = window.innerWidth;
+            matrixCanvas.height = window.innerHeight;
+            // Rebuild drops for new column count
+            const newCols = Math.floor(matrixCanvas.width / matrixFontSize);
+            matrixDrops.length = 0;
+            for (let i = 0; i < newCols; i++) matrixDrops[i] = Math.random() * -100;
+        });
 
         setInterval(drawMatrix, 35);
 
@@ -2779,7 +2839,7 @@
         canvas.height = window.innerHeight;
 
         const particles = [];
-        const particleCount = 150;
+        const particleCount = 80;
 
         class Particle {
             constructor() {
@@ -2818,28 +2878,37 @@
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+
             for (let i = 0; i < particles.length; i++) {
                 particles[i].update();
-                particles[i].draw();
-                
-                // Connect particles
-                for (let j = i; j < particles.length; j++) {
+                // Draw particle
+                ctx.globalAlpha = 0.6;
+                ctx.fillStyle = particles[i].color;
+                ctx.beginPath();
+                ctx.arc(particles[i].x, particles[i].y, particles[i].size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw connections in a separate pass so globalAlpha is clean
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
+                    if (Math.abs(dx) > 100) continue; // cheap early exit before sqrt
                     const dy = particles[i].y - particles[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < 100) {
-                        ctx.beginPath();
+                    if (Math.abs(dy) > 100) continue;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        ctx.globalAlpha = 0.15 * (1 - dist / 100);
                         ctx.strokeStyle = particles[i].color;
-                        ctx.globalAlpha = 0.1 * (1 - distance / 100);
                         ctx.lineWidth = 0.5;
+                        ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
                         ctx.stroke();
                     }
                 }
             }
+            ctx.globalAlpha = 1; // always reset at end of frame
             requestAnimationFrame(animate);
         }
 
@@ -2964,13 +3033,17 @@
         });
 
         // Create visualizer bars
-        const visualizer = document.getElementById('visualizer');
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 60; i++) {  // slightly more bars for denser look
             const bar = document.createElement('div');
             bar.className = 'bar';
-            bar.style.height = Math.random() * 80 + 20 + 'px';
-            bar.style.animationDelay = Math.random() * 2 + 's';
-            bar.style.animationDuration = (Math.random() * 1 + 0.5) + 's';
+            const minH = Math.floor(Math.random() * 10 + 4);
+            const maxH = Math.floor(Math.random() * 60 + 20);
+            bar.style.cssText = `
+                --min-h: ${minH}px;
+                --max-h: ${maxH}px;
+                --dur: ${(Math.random() * 0.8 + 0.4).toFixed(2)}s;
+                animation-delay: ${(Math.random() * 2).toFixed(2)}s;
+            `;
             visualizer.appendChild(bar);
         }
 
@@ -2990,18 +3063,24 @@
 
         // Click anywhere to trigger small confetti
         document.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
-                confetti({
-                    particleCount: 30,
-                    spread: 50,
-                    origin: {
-                        x: e.clientX / window.innerWidth,
-                        y: e.clientY / window.innerHeight
-                    },
-                    colors: ['#ff00ff', '#00ffff', '#ffff00'],
-                    disableForReducedMotion: true
-                });
+        // Walk up the DOM tree to check if any ancestor is a link or button
+        // This catches clicks on children of <a> tags too
+            let node = e.target;
+            while (node && node !== document.body) {
+                if (node.tagName === 'A' || node.tagName === 'BUTTON') return;
+                node = node.parentElement;
             }
+
+            confetti({
+                particleCount: 30,
+                spread: 50,
+                origin: {
+                    x: e.clientX / window.innerWidth,
+                    y: e.clientY / window.innerHeight
+                },
+                colors: ['#ff00ff', '#00ffff', '#ffff00'],
+                // Remove disableForReducedMotion — let it always fire
+            });
         });
 
         // Add typing effect to terminal
