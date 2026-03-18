@@ -730,19 +730,22 @@
         /* Skills Section */
         .skills {
             background: var(--darker-bg);
-            overflow: auto;
+            /* overflow: hidden; */
             position: relative;
         }
 
         .skills::before {
             content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: radial-gradient(circle, rgba(255, 0, 255, 0.1) 0%, transparent 70%);
             animation: skillBgRotate 30s linear infinite;
+            pointer-events: none;
+            will-change: transform;
+            z-index: 0;
         }
 
         @keyframes skillBgRotate {
@@ -1697,30 +1700,51 @@
             from { height: var(--min-h, 8px);  }
             to   { height: var(--max-h, 60px); }
         }
-        .stack-category {
-    min-height: 500px; /* Keep the larger value */
-}
+/* Icon grid for Languages & Frameworks cards */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+            gap: 14px;
+            margin-top: 10px;
+        }
 
-.stack-column {
-    position: relative;
-    height: 400px; /* Adjust based on number of items */
-    margin-top: 40px;
-}
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px 6px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 12px;
+            transition: all 0.3s;
+            cursor: default;
+        }
 
-.stack-item {
-    width: 70px;
-    height: 70px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    background: #111;
-    border-radius: 10px;
-    box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
-}
+        .icon-item i {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .icon-item span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .icon-item:hover {
+            background: rgba(0, 255, 255, 0.15);
+            border-color: var(--neon-cyan);
+            transform: translateY(-4px) scale(1.08);
+            box-shadow: 0 8px 24px rgba(0, 255, 255, 0.4);
+        }
+
+        .icon-item:hover span {
+            color: var(--neon-cyan);
+        }
     </style>
 </head>
 <body>
@@ -1835,32 +1859,27 @@
     
         <div class="skills-grid">
     
-            <!-- Languages -->
-            <div class="skill-category stack-category">
-    
-                <h3 class="skill-title">
-                    <i class="fas fa-code"></i> Languages
-                </h3>
-    
-                <div class="stack-column" id="lang-stack">
-    
-                    <div class="stack-item"><i class="devicon-c-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-cplusplus-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-java-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-python-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-html5-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-css3-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-bash-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-javascript-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-typescript-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-php-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-rust-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-zig-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-solidity-plain colored"></i></div>
-    
-                </div>
-    
+        <!-- Languages -->
+        <div class="skill-category">
+            <h3 class="skill-title">
+                <i class="fas fa-code"></i> Languages
+            </h3>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="devicon-c-plain colored"></i><span>C</span></div>
+                <div class="icon-item"><i class="devicon-cplusplus-plain colored"></i><span>C++</span></div>
+                <div class="icon-item"><i class="devicon-java-plain colored"></i><span>Java</span></div>
+                <div class="icon-item"><i class="devicon-python-plain colored"></i><span>Python</span></div>
+                <div class="icon-item"><i class="devicon-html5-plain colored"></i><span>HTML5</span></div>
+                <div class="icon-item"><i class="devicon-css3-plain colored"></i><span>CSS3</span></div>
+                <div class="icon-item"><i class="devicon-bash-plain colored"></i><span>Bash</span></div>
+                <div class="icon-item"><i class="devicon-javascript-plain colored"></i><span>JS</span></div>
+                <div class="icon-item"><i class="devicon-typescript-plain colored"></i><span>TS</span></div>
+                <div class="icon-item"><i class="devicon-php-plain colored"></i><span>PHP</span></div>
+                <div class="icon-item"><i class="devicon-rust-plain colored"></i><span>Rust</span></div>
+                <div class="icon-item"><i class="devicon-zig-plain colored"></i><span>Zig</span></div>
+                <div class="icon-item"><i class="devicon-solidity-plain colored"></i><span>Solidity</span></div>
             </div>
+        </div>
     
     
             <!-- Systems & Tools -->
@@ -1923,31 +1942,26 @@
     
     
             <!-- Frameworks & Web -->
-            <div class="skill-category stack-category">
-    
+            <div class="skill-category">
                 <h3 class="skill-title">
                     <i class="fas fa-laptop-code"></i> Frameworks & Web
                 </h3>
-    
-                <div class="stack-column" id="framework-stack">
-    
-                    <div class="stack-item"><i class="devicon-react-original colored"></i></div>
-                    <div class="stack-item"><i class="devicon-django-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-spring-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-laravel-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-mongodb-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-express-original colored"></i></div>
-                    <div class="stack-item"><i class="devicon-nodejs-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-nextjs-original"></i></div>
-                    <div class="stack-item"><i class="devicon-prisma-original colored"></i></div>
-                    <div class="stack-item"><i class="devicon-redis-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-supabase-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-mysql-plain colored"></i></div>
-                    <div class="stack-item"><i class="devicon-amazonwebservices-original colored"></i></div>
-                    <div class="stack-item"><i class="devicon-wireshark-plain colored"></i></div>
-    
+                <div class="icon-grid">
+                    <div class="icon-item"><i class="devicon-react-original colored"></i><span>React</span></div>
+                    <div class="icon-item"><i class="devicon-django-plain colored"></i><span>Django</span></div>
+                    <div class="icon-item"><i class="devicon-spring-plain colored"></i><span>Spring</span></div>
+                    <div class="icon-item"><i class="devicon-laravel-plain colored"></i><span>Laravel</span></div>
+                    <div class="icon-item"><i class="devicon-mongodb-plain colored"></i><span>MongoDB</span></div>
+                    <div class="icon-item"><i class="devicon-express-original colored"></i><span>Express</span></div>
+                    <div class="icon-item"><i class="devicon-nodejs-plain colored"></i><span>Node.js</span></div>
+                    <div class="icon-item"><i class="devicon-nextjs-original"></i><span>Next.js</span></div>
+                    <div class="icon-item"><i class="devicon-prisma-original colored"></i><span>Prisma</span></div>
+                    <div class="icon-item"><i class="devicon-redis-plain colored"></i><span>Redis</span></div>
+                    <div class="icon-item"><i class="devicon-supabase-plain colored"></i><span>Supabase</span></div>
+                    <div class="icon-item"><i class="devicon-mysql-plain colored"></i><span>MySQL</span></div>
+                    <div class="icon-item"><i class="devicon-amazonwebservices-original colored"></i><span>AWS</span></div>
+                    <div class="icon-item"><i class="devicon-wireshark-plain colored"></i><span>Wireshark</span></div>
                 </div>
-    
             </div>
     
     
@@ -2351,6 +2365,39 @@
                     </div>
                 </div>
             </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">Jan 2026 - March 2026</div>
+                    <h3 class="timeline-title">Global Property Consultant | Lead Qualification Team</h3>
+                    <div class="timeline-company">UniAcco Student Accommodation</div>
+                    <div class="timeline-desc">
+                        <ul>
+                            <li>Served as the first point of contact for student inquiries, managing high volumes of inbound and outbound calls/chats to qualify leads based on budget, course city, and accommodation preferences.</li>
+                            <li>Collaborated closely with the sales team to ensure a seamless handoff of qualified leads, resulting in a higher conversion rate and a more efficient sales pipeline.</li>
+                            <li>Maintained and updated Customer Relationship Management (CRM) systems with accurate lead data, categorizing leads by intent and follow-up priority.</li>
+                            <li>Identified student pain points and objections regarding student housing, providing feedback to the marketing team to refine targeting strategies.</li>
+                            <li>Achieved daily and weekly targets for lead qualification, talk time, and appointment setting, directly contributing to Uniacco’s occupancy rates.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">March 2026 - Present</div>
+                    <h3 class="timeline-title">Back End Developer | Insuretech Platform Engineering | PHP/Laravel Developer</h3>
+                    <div class="timeline-company">FynTune Solution Private Limited</div>
+                    <div class="timeline-desc">
+                        <ul>
+                            <li>My work focuses on designing and implementing reliable service-layer components that enable secure, scalable communication between APIs, databases, and distributed services operating in production environments.</li>
+                            <li>I collaborate with cross-functional engineering teams to build backend functionality that supports high-availability systems responsible for managing convoluted insurance workflows, transactional data, and service communication across microservice architectures. </li>
+                            <li>A significant part of my day-to-day work involves diagnosing systemic issues across application services, analyzing performance bottlenecks, and improving the efficiency and reliability of backend processes interacting with relational databases and message-driven systems.</li>
+                            <li>Working within the insurtech domain also requires navigating the broader architectural and operational constraints of financial software systems.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -2387,7 +2434,7 @@
                 <div class="testimonial-author">
                     <div class="author-info">
                         <h4>Prof. Premakumar Sunthar</h4>
-                        <p>Head, Application Software Center<br>Indian Institute of Technology, Bombay</p>
+                        <p>Ex-Head, Application Software Center<br>Indian Institute of Technology, Bombay</p>
                     </div>
                 </div>
             </div>
@@ -2491,6 +2538,9 @@
                     origin: { y: 0.6 },
                     colors: ['#ff00ff', '#00ffff', '#ffff00', '#00ff00']
                 });
+                ScrollTrigger.refresh();
+                animateStack('#lang-stack');
+                animateStack('#framework-stack');
             }, 1500);
         });
 
@@ -2751,84 +2801,84 @@
         });
 
         function animateStack(selector) {
-            const items = document.querySelectorAll(selector + " .stack-item");
-            const itemHeight = 70;
-            const gap = 10;
+            const items = document.querySelectorAll(selector + ' .stack-item');
+            const itemH = 70, gap = 10;
 
-            // Don't set initial state until ScrollTrigger fires — avoids pre-positioning items
             ScrollTrigger.create({
                 trigger: selector,
-                start: "top 75%",
+                start: 'top 85%',
                 once: true,
-                onEnter: () => {
-                    // Set scattered start positions right before animating
+                onEnter() {
                     gsap.set(items, {
-                        y: () => gsap.utils.random(-400, -100),
-                        rotation: () => gsap.utils.random(-45, 45),
-                        opacity: 0
+                        y: () => gsap.utils.random(-350, -80),
+                        rotation: () => gsap.utils.random(-50, 50),
+                        opacity: 0,
                     });
-
                     gsap.to(items, {
-                        y: (index) => index * (itemHeight + gap),
-                        rotation: () => gsap.utils.random(-4, 4),
+                        y: (i) => i * (itemH + gap),
+                        rotation: 0,
                         opacity: 1,
                         duration: 1.2,
-                        stagger: { each: 0.08, from: "start" },
-                        ease: "elastic.out(1, 0.5)"
+                        stagger: 0.08,
+                        ease: 'elastic.out(1, 0.5)',
                     });
                 }
             });
         }
 
-        animateStack("#lang-stack");
-        animateStack("#framework-stack");
+        // animateStack("#lang-stack");
+        // animateStack("#framework-stack");
 
-        // Matrix Rain Effect
-        const matrixCanvas = document.getElementById('matrix-canvas');
-        const matrixCtx = matrixCanvas.getContext('2d');
 
-        matrixCanvas.width = window.innerWidth;
-        matrixCanvas.height = window.innerHeight;
+        const chars = 'アイウエオカキクケコサシスセソ0123456789ABCDEF';
+        const fs = 14;
+        let drops = [];
 
-        const matrixChars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン 0123456789';
-        const matrixFontSize = 14;
-        const matrixColumns = matrixCanvas.width / matrixFontSize;
-        const matrixDrops = [];
-
-        for (let i = 0; i < matrixColumns; i++) {
-            matrixDrops[i] = Math.random() * -100;
+        function initDrops() {
+            const cols = Math.floor(mc.width / fs);
+            drops = Array.from({ length: cols }, () => Math.floor(Math.random() * -50));
         }
+        initDrops();
+        window.addEventListener('resize', () => {
+            mc.width = window.innerWidth;
+            mc.height = window.innerHeight;
+            initDrops();
+        });
 
         function drawMatrix() {
-            matrixCtx.fillStyle = 'rgba(5, 5, 5, 0.15)';  // was 0.05 — needs to be stronger
-            matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+            // Dim the canvas — this creates the fading green trail naturally
+            mctx.fillStyle = 'rgba(5,5,5,0.15)';
+            mctx.fillRect(0, 0, mc.width, mc.height);
+            mctx.font = fs + 'px monospace';
 
-            for (let i = 0; i < matrixDrops.length; i++) {
-                // Vary brightness: lead character is bright white, trail fades to green
-                const isLead = matrixDrops[i] > 0 && Math.random() > 0.9;
-                matrixCtx.fillStyle = isLead ? '#fff' : '#0f0';
-                matrixCtx.font = matrixFontSize + 'px monospace';
-                const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-                matrixCtx.fillText(text, i * matrixFontSize, matrixDrops[i] * matrixFontSize);
+            for (let i = 0; i < drops.length; i++) {
+                const y = drops[i] * fs;
+                if (y < 0) { drops[i]++; continue; }
 
-                // Reset when past bottom — consistent units (rows, not pixels)
-                if (matrixDrops[i] * matrixFontSize > matrixCanvas.height && Math.random() > 0.975) {
-                    matrixDrops[i] = 0;
+                const char = chars[Math.floor(Math.random() * chars.length)];
+
+                // Lead character: bright white. Previous chars already on canvas fade to green
+                // via the rgba fill above — no need to separately color them
+                mctx.fillStyle = drops[i] > 2 ? '#0f0' : '#fff';
+                mctx.fillText(char, i * fs, y);
+
+                if (y > mc.height && Math.random() > 0.975) {
+                    drops[i] = Math.floor(Math.random() * -30);
                 }
-                matrixDrops[i]++;
+                drops[i]++;
             }
         }
 
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            matrixCanvas.width = window.innerWidth;
-            matrixCanvas.height = window.innerHeight;
-            // Rebuild drops for new column count
-            const newCols = Math.floor(matrixCanvas.width / matrixFontSize);
-            matrixDrops.length = 0;
-            for (let i = 0; i < newCols; i++) matrixDrops[i] = Math.random() * -100;
-        });
+        // window.addEventListener('resize', () => {
+        //     canvas.width = window.innerWidth;
+        //     canvas.height = window.innerHeight;
+        //     matrixCanvas.width = window.innerWidth;
+        //     matrixCanvas.height = window.innerHeight;
+        //     // Rebuild drops for new column count
+        //     const newCols = Math.floor(matrixCanvas.width / matrixFontSize);
+        //     matrixDrops.length = 0;
+        //     for (let i = 0; i < newCols; i++) matrixDrops[i] = Math.random() * -100;
+        // });
 
         setInterval(drawMatrix, 35);
 
